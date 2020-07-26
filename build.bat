@@ -1,0 +1,1 @@
+bin\vasmm68k_mot.exe -kick1hunks -Fhunkexe -o gencop-exe -nosym gencop.s
