@@ -361,7 +361,7 @@ lp12:		move.l		pi,a1
 		move.l		d0,(a2,a1)
 		move.l		d1,(a3,a1)
 
-		jsr		plot
+		; jsr		plot
 		bra		dal1
 poza1:
 		move.l		#0,(a2,a1)
@@ -439,7 +439,7 @@ lp22:		move.l		pi,a1
 		move.l		d0,(a2,a1)
 		move.l		d1,(a3,a1)
 
-		jsr		plot
+		; jsr		plot
 		bra		dal2
 poza2:	
 		move.l		#0,(a2,a1)
@@ -471,22 +471,22 @@ draw_lines:
 		jsr		line
 ln1:
 
-		move.l		pxa+12*4,d0
+		move.l		pxa+02*4,d0
 		beq		ln2
-		move.l		pya+12*4,d1
-		move.l		pxa+14*4,d2
+		move.l		pya+02*4,d1
+		move.l		pxa+03*4,d2
 		beq		ln2
-		move.l		pya+14*4,d3
+		move.l		pya+03*4,d3
 		move.l		#LINE_WIDTH,d4
 		jsr		line
 ln2:
 
-		move.l		pxa+24*4,d0
+		move.l		pxa+03*4,d0
 		beq		ln3
-		move.l		pya+24*4,d1
-		move.l		pxa+26*4,d2
+		move.l		pya+03*4,d1
+		move.l		pxa+00*4,d2
 		beq		ln3
-		move.l		pya+26*4,d3
+		move.l		pya+00*4,d3
 		move.l		#LINE_WIDTH,d4
 		jsr		line
 ln3:
@@ -668,13 +668,14 @@ plot:
 ; =============================================================================
 
 line:
+		movea.l		a2,a0
+		lea		CUSTOM,a1										; snarf up the custom address register
+
 		btst		#DMAB_BLTDONE-8,DMACONR(a1)								; safety check
 waitblit1:
 		btst		#DMAB_BLTDONE-8,DMACONR(a1)								; wait for blitter
 		bne		waitblit1
 
-		movea.l		a2,a0
-		lea		CUSTOM,a1										; snarf up the custom address register
 		sub.w		d0,d2											; calculate dx
 		bmi		xneg											; if negative, octant is one of [3,4,5,6]
 		sub.w		d1,d3											; calculate dy   ''   is one of [1,2,7,8]
