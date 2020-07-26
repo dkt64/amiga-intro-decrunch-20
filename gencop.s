@@ -671,10 +671,10 @@ line:
 		movea.l		a2,a0
 		lea		CUSTOM,a1										; snarf up the custom address register
 
-		btst		#DMAB_BLTDONE-8,DMACONR(a1)								; safety check
-waitblit1:
-		btst		#DMAB_BLTDONE-8,DMACONR(a1)								; wait for blitter
-		bne		waitblit1
+; 		btst		#DMAB_BLTDONE-8,DMACONR(a1)								; safety check
+; waitblit1:
+; 		btst		#DMAB_BLTDONE-8,DMACONR(a1)								; wait for blitter
+; 		bne		waitblit1
 
 		sub.w		d0,d2											; calculate dx
 		bmi		xneg											; if negative, octant is one of [3,4,5,6]
@@ -743,6 +743,8 @@ waitblit2:
 		bpl		lineover										; if negative,
 		or.w		#SIGNFLAG,d5										; set sign bit in con1
 lineover:
+		or.w		#2,d5											; SING bit for filling
+		
 		move.w		d0,BLTCON0(a1)										; write control registers
 		move.w		d5,BLTCON1(a1)
 		move.w		d4,BLTCMOD(a1)										; C mod = bitplane width
