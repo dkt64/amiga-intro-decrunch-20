@@ -26,7 +26,8 @@ XSTOP		EQU	129+320
 YSTRT		EQU	44
 YSTOP		EQU	44+256
 HSTRT		EQU	129
-WIDTH		EQU	320												;actual bpl width (excluding modulos)
+WIDTH		EQU	320
+HEIGHT		EQU	256
 RES		EQU	8												;8=lores, 4=hires
 
 LINE_WIDTH	EQU	WIDTH/8
@@ -111,7 +112,7 @@ mainloop:
 		move.l		d1,frame
 
 	; bitplan 0
-		move.l		#bitplanes+0*320/8*256,d0
+		move.l		#bitplanes+0*WIDTH/8*HEIGHT,d0
 		move.w		#$00e2,(a6)+										; LO-bits of start of bitplane
 		move.w		d0,(a6)+										; go into $dff0e2
 		swap		d0
@@ -119,7 +120,7 @@ mainloop:
 		move.w		d0,(a6)+										; go into $dff0e0
 
 	; bitplan 1
-		move.l		#bitplanes+1*320/8*256,d0
+		move.l		#bitplanes+1*WIDTH/8*HEIGHT,d0
 		move.w		#$00e6,(a6)+										; LO-bits of start of bitplane
 		move.w		d0,(a6)+										; go into $dff0e6
 		swap		d0
@@ -127,7 +128,7 @@ mainloop:
 		move.w		d0,(a6)+										; go into $dff0e4
 
 	; bitplan 2
-		move.l		#bitplanes+2*320/8*256,d0
+		move.l		#bitplanes+2*WIDTH/8*HEIGHT,d0
 		move.w		#$00ea,(a6)+
 		move.w		d0,(a6)+
 		swap		d0
@@ -135,7 +136,7 @@ mainloop:
 		move.w		d0,(a6)+
 
 	; bitplan 3
-		move.l		#bitplanes+3*320/8*256,d0
+		move.l		#bitplanes+3*WIDTH/8*HEIGHT,d0
 		move.w		#$00ee,(a6)+
 		move.w		d0,(a6)+
 		swap		d0
@@ -306,7 +307,7 @@ my_fx:
 my_fx_buf1:
 
 		move.l		#buf1,a1
-		move.l		#320/8*256,d1
+		move.l		#WIDTH/8*HEIGHT,d1
 		jsr		clear
 
 		move.l		#0,pi
@@ -650,7 +651,7 @@ plot:
 		andi.l		#7,d2
 
 		lsr.l		#3,d0
-		mulu		#320/8,d1
+		mulu		#WIDTH/8,d1
 		add.l		d1,d0
 
 		move.b		(a1,d2),d4
@@ -778,18 +779,19 @@ waitblit1:
 		bne		waitblit1
 
 		lea		CUSTOM,a1										; snarf up the custom address register
+		add.l		#WIDTH/8*HEIGHT-2,a2
+		add.l		#WIDTH/8*HEIGHT-2,a3
 		move.l		a2,BLTAPT(a1)
-		move.l		a3,BLTBPT(a1)
 		move.l		a3,BLTDPT(a1)
-		move.l		#320/8,BLTAMOD(a1)
-		move.l		#320/8,BLTBMOD(a1)
-		move.l		#320/8,BLTDMOD(a1)
+		move.l		#WIDTH/8,BLTAMOD(a1)
+		move.l		#WIDTH/8,BLTDMOD(a1)
 		move.l		#$ffffffff,BLTAFWM(a1)
-		move.w		#$0dfc,BLTCON0(a1)
-		move.w		#FILL_XOR,BLTCON1(a1)
-		move.w		#320/8*256,d0
-		lsr.l		d1
-		move.w		d1,BLTSIZE(a1)
+		move.w		#$09fc,BLTCON0(a1)
+		move.w		#FILL_XOR+BLITREVERSE,BLTCON1(a1)
+		move.l		#HEIGHT,d0
+		lsl.l		#5,d0
+		or.l		#WIDTH/16,d0
+		move.w		d0,BLTSIZE(a1)
 
 		rts
 
