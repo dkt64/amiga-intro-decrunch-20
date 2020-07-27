@@ -22,7 +22,8 @@
         "--hard_drive_0=${workspaceFolder}/fs-uae/hd0",
         "--joystick_port_1=none",
         "--amiga_model=A500",
-        "--slow_memory=512"
+        "--slow_memory=512",
+        "--floppy_drive_volume_empty=0"
       ]
     },
     {
@@ -54,7 +55,8 @@
         "--slow_memory=512",
         "--remote_debugger=200",
         "--use_remote_debugger=true",
-        "--automatic_input_grab=0"
+        "--automatic_input_grab=0",
+        "--floppy_drive_volume_empty=0"
       ]
     }
   ]
