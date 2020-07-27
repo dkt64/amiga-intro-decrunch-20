@@ -491,6 +491,11 @@ ln2:
 		jsr		line
 ln3:
 
+		; kopiuj i wypełnij
+
+		move.l		#bitplanes+0*320/8*256,a3
+		jsr		copy_and_fill
+
 		rts
 
 ; =============================================================================
@@ -759,6 +764,35 @@ lineover:
 		move.w		d1,BLTSIZE(a1)										; Start blit
 		rts													; and return, blit still in progress.
         
+; =============================================================================
+; Copy and fill
+; a2 - bufor z linią
+; a3 - bufor docelowy
+; =============================================================================
+
+copy_and_fill:
+
+		btst		#DMAB_BLTDONE-8,DMACONR(a1)								; safety check
+waitblit1:
+		btst		#DMAB_BLTDONE-8,DMACONR(a1)								; wait for blitter
+		bne		waitblit1
+
+		lea		CUSTOM,a1										; snarf up the custom address register
+		move.l		a2,BLTAPT(a1)
+		move.l		a3,BLTBPT(a1)
+		move.l		a3,BLTDPT(a1)
+		move.l		#320/8,BLTAMOD(a1)
+		move.l		#320/8,BLTBMOD(a1)
+		move.l		#320/8,BLTDMOD(a1)
+		move.l		#$ffffffff,BLTAFWM(a1)
+		move.w		#$0dfc,BLTCON0(a1)
+		move.w		#FILL_XOR,BLTCON1(a1)
+		move.w		#320/8*256,d0
+		lsr.l		d1
+		move.w		d1,BLTSIZE(a1)
+
+		rts
+
 ; =============================================================================
 ; Czyszczenie bitplanu
 ; =============================================================================
