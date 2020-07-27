@@ -58,6 +58,7 @@ init:
 	; ---------------------------------------------------------------------
 	; zapis copperlisty i ekranu do późniejszeo odtworzenia
 	; ---------------------------------------------------------------------
+
 		move.l		$4,a6
 		move.l		#gfxname,a1
 		moveq		#0,d0
@@ -85,7 +86,6 @@ init:
 	; ---------------------------------------------------------------------
 
 		lea		CUSTOM,a6
-		move.w		#$6200,BPLCON0(a6)								; bitplany
 		move.w		#$0000,BPLCON1(a6)								; poziomy skrol = 0
 		move.w		#$0000,BPL1MOD(a6)								; modulo1
 		move.w		#$0000,BPL2MOD(a6)								; modulo2
@@ -97,6 +97,7 @@ init:
 	; ---------------------------------------------------------------------
         ; DMA i IRQ
 	; ---------------------------------------------------------------------
+
 		move.w		#%1000000111000000,DMACON(a6)							; DMA set ON
 		move.w		#%0000000000111111,DMACON(a6)							; DMA set OFF
 		move.w		#%1100000000000000,INTENA(a6)							; IRQ set ON
@@ -105,9 +106,11 @@ init:
 	; ---------------------------------------------------------------------
         ; Stworzenie copperlisty
 	; ---------------------------------------------------------------------
+
+
 mainloop:
 		move.l		frame,d1
-		move.l		#copper,a6
+		move.l		#cl,a6
 		addq.l		#1,d1
 		move.l		d1,frame
 
@@ -292,7 +295,7 @@ copper_buf0:
 	; ---------------------------------------------------------------------
 
 		lea		CUSTOM,a6
-		move.l		#copper,COP1LCH(a6)
+		move.l		#cl,COP1LCH(a6)
 
 	; ---------------------------------------------------------------------
 	; czekanie na nową ramkę
@@ -398,7 +401,10 @@ my_fx_buf1:
 		move.l		#WIDTH/8*HEIGHT,d1
 		jsr		clear
 
-		move.w		#$0,$dff180
+waitb32:	btst		#6,DMACONR
+		bne.s		waitb32
+
+		move.w		#$0888,$dff180
 
 		move.l		#0,pi
 lp1:		move.l		pi,a1
@@ -424,7 +430,7 @@ lp1:		move.l		pi,a1
 		move.l		d1,(a3,a1)
 	
 		addi.l		#4,pi
-		cmpi.l		#4*37,pi
+		cmpi.l		#4*12,pi
 		bne		lp1
 
 		move.w		#$00f0,$dff180
@@ -466,7 +472,7 @@ poza1:
 		move.l		#0,(a3,a1)
 dal1:
 		addi.l		#4,pi
-		cmpi.l		#4*37,pi
+		cmpi.l		#4*12,pi
 		bne		lp12
 
 		move.w		#$0,$dff180
@@ -475,9 +481,9 @@ dal1:
 		jsr		draw_lines
 
 		; kopiuj i wypełnij
-		; move.l		#buf1,a2
-		; move.l		#bitplane_vector1,a3
-		; jsr		copy_and_fill
+		move.l		#buf1,a2
+		move.l		#bitplane_vector1,a3
+		jsr		copy_and_fill
 
 		rts
 
@@ -490,6 +496,11 @@ my_fx_buf2:
 		move.l		#buf2,a1
 		move.l		#320/8*256,d1
 		jsr		clear
+
+		move.w		#$0888,$dff180
+
+waitb33:	btst		#6,DMACONR
+		bne.s		waitb33
 
 		move.l		#0,pi
 lp2:		move.l		pi,a1
@@ -515,7 +526,7 @@ lp2:		move.l		pi,a1
 		move.l		d1,(a3,a1)
 
 		addi.l		#4,pi
-		cmpi.l		#4*37,pi
+		cmpi.l		#4*12,pi
 		bne		lp2
 
 		move.w		#$00f0,$dff180
@@ -559,7 +570,7 @@ poza2:
 dal2:
 
 		addi.l		#4,pi
-		cmpi.l		#4*37,pi
+		cmpi.l		#4*12,pi
 		bne		lp22
 
 		move.w		#$0,$dff180
@@ -568,9 +579,9 @@ dal2:
 		jsr		draw_lines
 
 		; kopiuj i wypełnij
-		; move.l		#buf2,a2
-		; move.l		#bitplane_vector2,a3
-		; jsr		copy_and_fill
+		move.l		#buf2,a2
+		move.l		#bitplane_vector2,a3
+		jsr		copy_and_fill
 
 		rts
 
@@ -584,16 +595,16 @@ draw_lines:
 		move.l		pxa+00*4,d0
 		beq		ln1
 		move.l		pya+00*4,d1
-		move.l		pxa+02*4,d2
+		move.l		pxa+01*4,d2
 		beq		ln1
-		move.l		pya+02*4,d3
+		move.l		pya+01*4,d3
 		move.l		#LINE_WIDTH,d4
 		jsr		line
 ln1:
 
-		move.l		pxa+02*4,d0
+		move.l		pxa+01*4,d0
 		beq		ln2
-		move.l		pya+02*4,d1
+		move.l		pya+01*4,d1
 		move.l		pxa+03*4,d2
 		beq		ln2
 		move.l		pya+03*4,d3
@@ -604,12 +615,22 @@ ln2:
 		move.l		pxa+03*4,d0
 		beq		ln3
 		move.l		pya+03*4,d1
-		move.l		pxa+00*4,d2
+		move.l		pxa+02*4,d2
 		beq		ln3
-		move.l		pya+00*4,d3
+		move.l		pya+02*4,d3
 		move.l		#LINE_WIDTH,d4
 		jsr		line
 ln3:
+
+		move.l		pxa+02*4,d0
+		beq		ln4
+		move.l		pya+02*4,d1
+		move.l		pxa+00*4,d2
+		beq		ln4
+		move.l		pya+00*4,d3
+		move.l		#LINE_WIDTH,d4
+		jsr		line
+ln4:
 
 		rts
 
@@ -900,7 +921,7 @@ waitblit1:
 		move.l		#WIDTH/8,BLTAMOD(a1)
 		move.l		#WIDTH/8,BLTDMOD(a1)
 		move.l		#$ffffffff,BLTAFWM(a1)
-		move.w		#$09fc,BLTCON0(a1)
+		move.w		#$09f0,BLTCON0(a1)
 		move.w		#FILL_XOR+BLITREVERSE,BLTCON1(a1)
 		move.l		#HEIGHT,d0
 		lsl.l		#5,d0
@@ -950,84 +971,31 @@ zoomz_index:
 pi:		dc.l		0
 
 px:
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-		dc.l		0
+		dc.l		-200,200
+		dc.l		-200,200
+		dc.l		-200,200
+		dc.l		-200,200
+		dc.l		-200,200
+		dc.l		0,0
 py:
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-		dc.l		0
+		dc.l		200,200
+		dc.l		-200,-200
+		dc.l		200,200
+		dc.l		-200,-200
+		dc.l		0,0
+		dc.l		-200,200
 pz:
-		dc.l		200,200,200
-		dc.l		200,200,200
-		dc.l		200,200,200
-		dc.l		200,200,200
-		dc.l		0,0,0
-		dc.l		0,0,0
-		dc.l		0,0,0
-		dc.l		0,0,0
-		dc.l		-200,-200,-200
-		dc.l		-200,-200,-200
-		dc.l		-200,-200,-200
-		dc.l		-200,-200,-200
-		dc.l		0
+		dc.l		-200,-200
+		dc.l		-200,-200
+		dc.l		200,200
+		dc.l		200,200
+		dc.l		0,0
+		dc.l		0,0
 
 pxa:
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-		dc.l		0
+		blk.l		12,0
 pya:
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-
-		dc.l		200,200,200
-		dc.l		-200,-200,-200
-		dc.l		-200,0,200
-		dc.l		-200,0,200
-		dc.l		0
+		blk.l		12,0
 
 ax:		dc.l		0
 ay:		dc.l		0
@@ -1214,10 +1182,164 @@ colors:
 ; -----------------------------------------------------------------------------
 ; copperlista
 ; -----------------------------------------------------------------------------
+
 		CNOP		0,4
-copper:
+cl:
+cl_logo_address:
+		dc.w		BPL1PTH,0
+		dc.w		BPL1PTL,0
+		dc.w		BPL2PTH,0
+		dc.w		BPL2PTL,0
+		dc.w		BPL3PTH,0
+		dc.w		BPL3PTL,0
+		dc.w		BPL4PTH,0
+		dc.w		BPL4PTL,0
+		dc.w		BPL5PTH,0
+		dc.w		BPL5PTL,0
+		dc.w		BPL6PTH,0
+		dc.w		BPL6PTL,0
+
+cl_logo_colors:
+		dc.w		COLOR00,0
+		dc.w		COLOR01,0
+		dc.w		COLOR02,0
+		dc.w		COLOR03,0
+		dc.w		COLOR04,0
+		dc.w		COLOR05,0
+		dc.w		COLOR06,0
+		dc.w		COLOR07,0
+		dc.w		COLOR08,0
+		dc.w		COLOR09,0
+		dc.w		COLOR10,0
+		dc.w		COLOR11,0
+		dc.w		COLOR12,0
+		dc.w		COLOR13,0
+		dc.w		COLOR14,0
+		dc.w		COLOR15,0
+		dc.w		COLOR16,0
+		dc.w		COLOR17,0
+		dc.w		COLOR18,0
+		dc.w		COLOR19,0
+		dc.w		COLOR20,0
+		dc.w		COLOR21,0
+		dc.w		COLOR22,0
+		dc.w		COLOR23,0
+		dc.w		COLOR24,0
+		dc.w		COLOR25,0
+		dc.w		COLOR26,0
+		dc.w		COLOR27,0
+		dc.w		COLOR28,0
+		dc.w		COLOR29,0
+		dc.w		COLOR30,0
+		dc.w		COLOR31,0
+
+cl_logo_bitplanes_nr:
+		dc.w		BPLCON0,0
+
+		dc.w		$0051,$ff00									; czekam na raster
+cl_vector_address:
+		dc.w		BPL1PTH,0
+		dc.w		BPL1PTL,0
+		dc.w		BPL2PTH,0
+		dc.w		BPL2PTL,0
+		dc.w		BPL3PTH,0
+		dc.w		BPL3PTL,0
+		dc.w		BPL4PTH,0
+		dc.w		BPL4PTL,0
+		dc.w		BPL5PTH,0
+		dc.w		BPL5PTL,0
+		dc.w		BPL6PTH,0
+		dc.w		BPL6PTL,0
+cl_vector_colors:
+		dc.w		COLOR00,0
+		dc.w		COLOR01,0
+		dc.w		COLOR02,0
+		dc.w		COLOR03,0
+		dc.w		COLOR04,0
+		dc.w		COLOR05,0
+		dc.w		COLOR06,0
+		dc.w		COLOR07,0
+		dc.w		COLOR08,0
+		dc.w		COLOR09,0
+		dc.w		COLOR10,0
+		dc.w		COLOR11,0
+		dc.w		COLOR12,0
+		dc.w		COLOR13,0
+		dc.w		COLOR14,0
+		dc.w		COLOR15,0
+		dc.w		COLOR16,0
+		dc.w		COLOR17,0
+		dc.w		COLOR18,0
+		dc.w		COLOR19,0
+		dc.w		COLOR20,0
+		dc.w		COLOR21,0
+		dc.w		COLOR22,0
+		dc.w		COLOR23,0
+		dc.w		COLOR24,0
+		dc.w		COLOR25,0
+		dc.w		COLOR26,0
+		dc.w		COLOR27,0
+		dc.w		COLOR28,0
+		dc.w		COLOR29,0
+		dc.w		COLOR30,0
+		dc.w		COLOR31,0
+
+cl_vector_bitplanes_nr:
+		dc.w		BPLCON0,0
+
+		dc.w		$00c1,$ff00									; czekam na raster
+cl_scroll_address:
+		dc.w		BPL1PTH,0
+		dc.w		BPL1PTL,0
+		dc.w		BPL2PTH,0
+		dc.w		BPL2PTL,0
+		dc.w		BPL3PTH,0
+		dc.w		BPL3PTL,0
+		dc.w		BPL4PTH,0
+		dc.w		BPL4PTL,0
+		dc.w		BPL5PTH,0
+		dc.w		BPL5PTL,0
+		dc.w		BPL6PTH,0
+		dc.w		BPL6PTL,0
+cl_scroll_colors:
+		dc.w		COLOR00,0
+		dc.w		COLOR01,0
+		dc.w		COLOR02,0
+		dc.w		COLOR03,0
+		dc.w		COLOR04,0
+		dc.w		COLOR05,0
+		dc.w		COLOR06,0
+		dc.w		COLOR07,0
+		dc.w		COLOR08,0
+		dc.w		COLOR09,0
+		dc.w		COLOR10,0
+		dc.w		COLOR11,0
+		dc.w		COLOR12,0
+		dc.w		COLOR13,0
+		dc.w		COLOR14,0
+		dc.w		COLOR15,0
+		dc.w		COLOR16,0
+		dc.w		COLOR17,0
+		dc.w		COLOR18,0
+		dc.w		COLOR19,0
+		dc.w		COLOR20,0
+		dc.w		COLOR21,0
+		dc.w		COLOR22,0
+		dc.w		COLOR23,0
+		dc.w		COLOR24,0
+		dc.w		COLOR25,0
+		dc.w		COLOR26,0
+		dc.w		COLOR27,0
+		dc.w		COLOR28,0
+		dc.w		COLOR29,0
+		dc.w		COLOR30,0
+		dc.w		COLOR31,0
+
+cl_scroll_bitplanes_nr:
+		dc.w		BPLCON0,0
+
 		dc.l		$ffffffe
-		blk.l		1023,0
+		; blk.l		1023,0
 
 ; =============================================================================
 ; MUZA
