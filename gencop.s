@@ -30,10 +30,12 @@ YSTOP		EQU	44+256
 HSTRT		EQU	129
 WIDTH		EQU	320
 HEIGHT		EQU	256
-RES		EQU	8													;8=lores, 4=hires
+RES		EQU	8												;8=lores, 4=hires
 
 LINE_WIDTH	EQU	WIDTH/8
 
+RASTER_VECTORS	EQU	$6f
+RASTER_SCROLL	EQU	$ff
 	
 ; =============================================================================
 ; Start programu
@@ -90,23 +92,23 @@ init:
 
 		lea			CUSTOM,a6
 
-		move.w			#$0000,BPLCON0(a6)									; ilość bitplanów
-		move.w			#$0000,BPLCON1(a6)									; poziomy skrol = 0
-		move.w			#$0000,BPL1MOD(a6)									; modulo1
-		move.w			#$0000,BPL2MOD(a6)									; modulo2
-		move.w			#(XSTRT+(YSTRT*256)),DIWSTRT(a6)							; DIWSTRT - górny-lewy róg ekranu (2c81)
-		move.w			#((XSTOP-256)+(YSTOP-256)*256),DIWSTOP(a6)						; DIWSTOP - dolny-prawy róg ekranu (c8d1)
-		move.w			#(HSTRT/2-RES),DDFSTRT(a6)								; DDFSTRT
-		move.w			#((HSTRT/2-RES)+(8*((WIDTH/16)-1))),DDFSTOP(a6)						; DDFSTOP
+		move.w			#$0000,BPLCON0(a6)								; ilość bitplanów
+		move.w			#$0000,BPLCON1(a6)								; poziomy skrol = 0
+		move.w			#$0000,BPL1MOD(a6)								; modulo1
+		move.w			#$0000,BPL2MOD(a6)								; modulo2
+		move.w			#(XSTRT+(YSTRT*256)),DIWSTRT(a6)						; DIWSTRT - górny-lewy róg ekranu (2c81)
+		move.w			#((XSTOP-256)+(YSTOP-256)*256),DIWSTOP(a6)					; DIWSTOP - dolny-prawy róg ekranu (c8d1)
+		move.w			#(HSTRT/2-RES),DDFSTRT(a6)							; DDFSTRT
+		move.w			#((HSTRT/2-RES)+(8*((WIDTH/16)-1))),DDFSTOP(a6)					; DDFSTOP
 
 	; ---------------------------------------------------------------------
         ; DMA i IRQ
 	; ---------------------------------------------------------------------
 
-		move.w			#%1000000111000000,DMACON(a6)								; DMA set ON
-		move.w			#%0000000000111111,DMACON(a6)								; DMA set OFF
-		move.w			#%1100000000000000,INTENA(a6)								; IRQ set ON
-		move.w			#%0011111111111111,INTENA(a6)								; IRQ set OFF
+		move.w			#%1000000111000000,DMACON(a6)							; DMA set ON
+		move.w			#%0000000000111111,DMACON(a6)							; DMA set OFF
+		move.w			#%1100000000000000,INTENA(a6)							; IRQ set ON
+		move.w			#%0011111111111111,INTENA(a6)							; IRQ set OFF
 
 	; ---------------------------------------------------------------------
         ; Stworzenie copperlisty
@@ -126,59 +128,71 @@ init:
 		move.l			#cl_scroll_bitplanes_nr+2,a0
 		move.w			d0,(a0)
 
-	; bitplan 0
+	; logo bitplan 0
 		move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*00,a0
-		move.l			#cl_scroll_address+2+4*00,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
 		swap			d0
 		move.l			#cl_logo_address+2+4*01,a0
-		move.l			#cl_scroll_address+2+4*01,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
-	; bitplan 1
+	; logo bitplan 1
 		move.l			#logo_bitplanes+1*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*02,a0
-		move.l			#cl_scroll_address+2+4*02,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
 		swap			d0
 		move.l			#cl_logo_address+2+4*03,a0
-		move.l			#cl_scroll_address+2+4*03,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
-	; bitplan 2
+	; logo bitplan 2
 		move.l			#logo_bitplanes+2*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*04,a0
-		move.l			#cl_scroll_address+2+4*04,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
 		swap			d0
 		move.l			#cl_logo_address+2+4*05,a0
-		move.l			#cl_scroll_address+2+4*05,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
-	; bitplan 3
+	; logo bitplan 3
 		move.l			#logo_bitplanes+3*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*06,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_logo_address+2+4*07,a0
 		move.w			d0,(a0)
-	; bitplan 4
+	; logo bitplan 4
 		move.l			#logo_bitplanes+4*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*08,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_logo_address+2+4*09,a0
 		move.w			d0,(a0)
-	; bitplan 5
+	; logo bitplan 5
 		move.l			#logo_bitplanes+5*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*10,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_logo_address+2+4*11,a0
+		move.w			d0,(a0)
+
+	; scroll bitplan 0
+		move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8*HEIGHT,d0
+		move.l			#cl_scroll_address+2+4*00,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_scroll_address+2+4*01,a0
+		move.w			d0,(a0)
+
+	; scroll bitplan 1
+		move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8*HEIGHT,d0
+		move.l			#cl_scroll_address+2+4*02,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_scroll_address+2+4*03,a0
+		move.w			d0,(a0)
+
+	; scroll bitplan 2
+		move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8*HEIGHT,d0
+		move.l			#cl_scroll_address+2+4*04,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_scroll_address+2+4*05,a0
 		move.w			d0,(a0)
 
 	; kolory logo
@@ -379,28 +393,6 @@ init:
 		move.l			#cl_scroll_colors+2+4*07,a0
 		move.w			d0,(a0)
 
-	; bitplan 0
-		move.l			#buf1+0*WIDTH/8*HEIGHT,d0
-		move.l			#cl_vector_address+2+4*00,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*01,a0
-		move.w			d0,(a0)
-	; bitplan 1
-		move.l			#buf1+1*WIDTH/8*HEIGHT,d0
-		move.l			#cl_vector_address+2+4*02,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*03,a0
-		move.w			d0,(a0)
-	; bitplan 2
-		move.l			#buf1+2*WIDTH/8*HEIGHT,d0
-		move.l			#cl_vector_address+2+4*04,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*05,a0
-		move.w			d0,(a0)
-
 	; =====================================================================
 	; main loop
 	; =====================================================================
@@ -425,21 +417,21 @@ raster:
 		beq			copper_buf2
 
 	; bitplan 0
-		move.l			#buf1+0*WIDTH/8*HEIGHT,d0
+		move.l			#buf1+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*00,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*01,a0
 		move.w			d0,(a0)
 	; bitplan 1
-		move.l			#buf1+1*WIDTH/8*HEIGHT,d0
+		move.l			#buf1+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*02,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*03,a0
 		move.w			d0,(a0)
 	; bitplan 2
-		move.l			#buf1+2*WIDTH/8*HEIGHT,d0
+		move.l			#buf1+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*04,a0
 		move.w			d0,(a0)
 		swap			d0
@@ -451,21 +443,21 @@ raster:
 copper_buf2:
 
 	; bitplan 0
-		move.l			#buf2+0*WIDTH/8*HEIGHT,d0
+		move.l			#buf2+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*00,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*01,a0
 		move.w			d0,(a0)
 	; bitplan 1
-		move.l			#buf2+1*WIDTH/8*HEIGHT,d0
+		move.l			#buf2+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*02,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*03,a0
 		move.w			d0,(a0)
 	; bitplan 2
-		move.l			#buf2+2*WIDTH/8*HEIGHT,d0
+		move.l			#buf2+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*04,a0
 		move.w			d0,(a0)
 		swap			d0
@@ -485,7 +477,7 @@ copper_buf0:
 	; ---------------------------------------------------------------------
 
 		jsr			mt_music
-		lea			CUSTOM,a6										; przywracamy CUSTOM
+		lea			CUSTOM,a6									; przywracamy CUSTOM
 
 	; ---------------------------------------------------------------------
 	; FX
@@ -519,11 +511,11 @@ exit:
 		move.l			oldcopper,COP1LCH(a6)
 		move.l			gfxbase,a6
 		move.l			oldview,a1
-		jsr			-222(a6)										; LoadView
-		jsr			-270(a6)										; WaitTOF
-		jsr			-270(a6)										; WaitTOF
+		jsr			-222(a6)									; LoadView
+		jsr			-270(a6)									; WaitTOF
+		jsr			-270(a6)									; WaitTOF
 		move.l			$4,a6
-		jsr			-138(a6)										; Permit
+		jsr			-138(a6)									; Permit
 		rts
 
 ; =============================================================================
@@ -802,9 +794,9 @@ rotate:
 		clr.l			d6
 		move.l			ax,d3
 		asl			#1,d3
-		move.w			(a0,d3),d4										; sin
+		move.w			(a0,d3),d4									; sin
 		move.l			d4,d5
-		move.w			(a1,d3),d6										; cos
+		move.w			(a1,d3),d6									; cos
 		move.l			d6,d7
 	; y
 		muls			d1,d6
@@ -835,9 +827,9 @@ rotate:
 		clr.l			d6
 		move.l			ay,d3
 		asl			#1,d3
-		move.w			(a0,d3),d4										; sin
+		move.w			(a0,d3),d4									; sin
 		move.l			d4,d5
-		move.w			(a1,d3),d6										; cos
+		move.w			(a1,d3),d6									; cos
 		move.l			d6,d7
 	; x
 		muls			d0,d6
@@ -867,9 +859,9 @@ rotate:
 		clr.l			d6
 		move.l			az,d3
 		asl			#1,d3
-		move.w			(a0,d3),d4										; sin
+		move.w			(a0,d3),d4									; sin
 		move.l			d4,d5
-		move.w			(a1,d3),d6										; cos
+		move.w			(a1,d3),d6									; cos
 		move.l			d6,d7
 	; x
 		muls			d0,d6
@@ -962,87 +954,87 @@ plot:
 line:
 		movea.l			a2,a0
 
-		sub.w			d0,d2											; calculate dx
-		bmi			xneg											; if negative, octant is one of [3,4,5,6]
-		sub.w			d1,d3											; calculate dy   ''   is one of [1,2,7,8]
-		bmi			yneg											; if negative, octant is one of [7,8]
-		cmp.w			d3,d2											; cmp |dx|,|dy|  ''   is one of [1,2]
-		bmi			ygtx											; if y>x, octant is 2
-		moveq.l			#OCTANT1+LINEMODE,d5									; otherwise octant is 1
-		bra			lineagain										; go to the common section
+		sub.w			d0,d2										; calculate dx
+		bmi			xneg										; if negative, octant is one of [3,4,5,6]
+		sub.w			d1,d3										; calculate dy   ''   is one of [1,2,7,8]
+		bmi			yneg										; if negative, octant is one of [7,8]
+		cmp.w			d3,d2										; cmp |dx|,|dy|  ''   is one of [1,2]
+		bmi			ygtx										; if y>x, octant is 2
+		moveq.l			#OCTANT1+LINEMODE,d5								; otherwise octant is 1
+		bra			lineagain									; go to the common section
 ygtx:
-		exg			d2,d3											; X must be greater than Y
-		moveq.l			#OCTANT2+LINEMODE,d5									; we are in octant 2
-		bra			lineagain										; and common again.
+		exg			d2,d3										; X must be greater than Y
+		moveq.l			#OCTANT2+LINEMODE,d5								; we are in octant 2
+		bra			lineagain									; and common again.
 yneg:
-		neg.w			d3											; calculate abs(dy)
-		cmp.w			d3,d2											; cmp |dx|,|dy|, octant is [7,8]
-		bmi			ynygtx											; if y>x, octant is 7
-		moveq.l			#OCTANT8+LINEMODE,d5									; otherwise octant is 8
+		neg.w			d3										; calculate abs(dy)
+		cmp.w			d3,d2										; cmp |dx|,|dy|, octant is [7,8]
+		bmi			ynygtx										; if y>x, octant is 7
+		moveq.l			#OCTANT8+LINEMODE,d5								; otherwise octant is 8
 		bra			lineagain
 ynygtx:
-		exg			d2,d3											; X must be greater than Y
-		moveq.l			#OCTANT7+LINEMODE,d5									; we are in octant 7
+		exg			d2,d3										; X must be greater than Y
+		moveq.l			#OCTANT7+LINEMODE,d5								; we are in octant 7
 		bra			lineagain
 xneg:
-		neg.w			d2											; dx was negative! octant is [3,4,5,6]
-		sub.w			d1,d3											; we calculate dy
-		bmi			xyneg											; if negative, octant is one of [5,6]
-		cmp.w			d3,d2											; otherwise it's one of [3,4]
-		bmi			xnygtx											; if y>x, octant is 3
-		moveq.l			#OCTANT4+LINEMODE,d5									; otherwise it's 4
+		neg.w			d2										; dx was negative! octant is [3,4,5,6]
+		sub.w			d1,d3										; we calculate dy
+		bmi			xyneg										; if negative, octant is one of [5,6]
+		cmp.w			d3,d2										; otherwise it's one of [3,4]
+		bmi			xnygtx										; if y>x, octant is 3
+		moveq.l			#OCTANT4+LINEMODE,d5								; otherwise it's 4
 		bra			lineagain
 xnygtx:
-		exg			d2,d3											; X must be greater than Y
-		moveq.l			#OCTANT3+LINEMODE,d5									; we are in octant 3
+		exg			d2,d3										; X must be greater than Y
+		moveq.l			#OCTANT3+LINEMODE,d5								; we are in octant 3
 		bra			lineagain
 xyneg:
-		neg.w			d3											; y was negative, in one of [5,6]
-		cmp.w			d3,d2											; is y>x?
-		bmi			xynygtx											; if so, octant is 6
-		moveq.l			#OCTANT5+LINEMODE,d5									; otherwise, octant is 5
+		neg.w			d3										; y was negative, in one of [5,6]
+		cmp.w			d3,d2										; is y>x?
+		bmi			xynygtx										; if so, octant is 6
+		moveq.l			#OCTANT5+LINEMODE,d5								; otherwise, octant is 5
 		bra			lineagain
 xynygtx:
-		exg			d2,d3											; X must be greater than Y
-		moveq.l			#OCTANT6+LINEMODE,d5									; we are in octant 6
+		exg			d2,d3										; X must be greater than Y
+		moveq.l			#OCTANT6+LINEMODE,d5								; we are in octant 6
 lineagain:
-		mulu.w			d4,d1											; Calculate y1 * width
-		ror.l			#4,d0											; move upper four bits into hi word
-		add.w			d0,d0											; multiply by 2
-		add.l			d1,a0											; ptr += (x1 >> 3)
-		add.w			d0,a0											; ptr += y1 * width
-		swap			d0											; get the four bits of x1
-		or.w			#$BFA,d0										; or with USEA, USEC, USED, F=A+C
-		lsl.w			#2,d3											; Y = 4 * Y
-		add.w			d2,d2											; X = 2 * X
-		move.w			d2,d1											; set up size word
-		lsl.w			#5,d1											; shift five left
-		add.w			#$42,d1											; and add 1 to height, 2 to width
+		mulu.w			d4,d1										; Calculate y1 * width
+		ror.l			#4,d0										; move upper four bits into hi word
+		add.w			d0,d0										; multiply by 2
+		add.l			d1,a0										; ptr += (x1 >> 3)
+		add.w			d0,a0										; ptr += y1 * width
+		swap			d0										; get the four bits of x1
+		or.w			#$BFA,d0									; or with USEA, USEC, USED, F=A+C
+		lsl.w			#2,d3										; Y = 4 * Y
+		add.w			d2,d2										; X = 2 * X
+		move.w			d2,d1										; set up size word
+		lsl.w			#5,d1										; shift five left
+		add.w			#$42,d1										; and add 1 to height, 2 to width
 		
 		M_BLITTER_WAIT
 		
-		move.w			d3,BLTBMOD(a6)										; B mod = 4 * Y
+		move.w			d3,BLTBMOD(a6)									; B mod = 4 * Y
 		sub.w			d2,d3
 		ext.l			d3
-		move.l			d3,BLTAPT(a6)										; A ptr = 4 * Y - 2 * X
-		bpl			lineover										; if negative,
-		or.w			#SIGNFLAG,d5										; set sign bit in con1
+		move.l			d3,BLTAPT(a6)									; A ptr = 4 * Y - 2 * X
+		bpl			lineover									; if negative,
+		or.w			#SIGNFLAG,d5									; set sign bit in con1
 lineover:
-		or.w			#2,d5											; SING bit for filling
+		or.w			#2,d5										; SING bit for filling
 		
-		move.w			d0,BLTCON0(a6)										; write control registers
+		move.w			d0,BLTCON0(a6)									; write control registers
 		move.w			d5,BLTCON1(a6)
-		move.w			d4,BLTCMOD(a6)										; C mod = bitplane width
-		move.w			d4,BLTDMOD(a6)										; D mod = bitplane width
+		move.w			d4,BLTCMOD(a6)									; C mod = bitplane width
+		move.w			d4,BLTDMOD(a6)									; D mod = bitplane width
 		sub.w			d2,d3
-		move.w			d3,BLTAMOD(a6)										; A mod = 4 * Y - 4 * X
-		move.w			#$8000,BLTADAT(a6)									; A data = 0x8000
-		moveq.l			#-1,d5											; Set masks to all ones
-		move.l			d5,BLTAFWM(a6)										; we can hit both masks at once
-		move.l			a0,BLTCPT(a6)										; Pointer to first pixel to set
+		move.w			d3,BLTAMOD(a6)									; A mod = 4 * Y - 4 * X
+		move.w			#$8000,BLTADAT(a6)								; A data = 0x8000
+		moveq.l			#-1,d5										; Set masks to all ones
+		move.l			d5,BLTAFWM(a6)									; we can hit both masks at once
+		move.l			a0,BLTCPT(a6)									; Pointer to first pixel to set
 		move.l			a0,BLTDPT(a6)
-		move.w			d1,BLTSIZE(a6)										; Start blit
-		rts														; and return, blit still in progress.
+		move.w			d1,BLTSIZE(a6)									; Start blit
+		rts													; and return, blit still in progress.
         
 ; =============================================================================
 ; Copy and fill
@@ -1077,11 +1069,11 @@ copy_and_fill:
 clear:
 		M_BLITTER_WAIT
 
-		clr.w			BLTDMOD(a6)										;destination modulo
-		move.l			#$01000000,BLTCON0(a6)									;set operation type in BLTCON0/1
+		clr.w			BLTDMOD(a6)									;destination modulo
+		move.l			#$01000000,BLTCON0(a6)								;set operation type in BLTCON0/1
 		lsr.l			d1
-		move.l			a1,BLTDPTH(a6)										;destination address
-		move.w			d1,BLTSIZE(a6)										;blitter operation size
+		move.l			a1,BLTDPTH(a6)									;destination address
+		move.w			d1,BLTSIZE(a6)									;blitter operation size
 
 		rts
 
@@ -1317,7 +1309,8 @@ logo_colors:
 
 		CNOP			0,4
 vector_colors:
-		dc.w			$0000,$0fff,$0fff,$0fff,$0fff,$0fff,$0fff,$0fff
+		incbin			"gfx/logo.pal"
+		; dc.w			$0000,$0fff,$0fff,$0fff,$0fff,$0fff,$0fff,$0fff
 
 		CNOP			0,4
 scroll_colors:
@@ -1382,7 +1375,9 @@ cl_logo_colors:
 cl_logo_bitplanes_nr:
 		dc.w			BPLCON0,0
 
-		dc.w			$8001,$ff00										; czekam na raster
+		; vector
+
+		dc.w			RASTER_VECTORS << 8 + 1,$ff00							; czekam na raster
 
 cl_vector_address:
 		dc.w			BPL1PTL,0
@@ -1405,7 +1400,9 @@ cl_vector_colors:
 cl_vector_bitplanes_nr:
 		dc.w			BPLCON0,0
 
-		dc.w			$c001,$ff00										; czekam na raster
+		; scroll
+
+		dc.w			RASTER_SCROLL << 8 + 1,$ff00							; czekam na raster
 
 cl_scroll_address:
 		dc.w			BPL1PTL,0
