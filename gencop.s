@@ -630,7 +630,7 @@ lp12:		move.l			pi,a1
 		move.l			d0,(a2,a1)
 		move.l			d1,(a3,a1)
 
-		; jsr		plot
+		; jsr			plot
 		bra			dal1
 poza1:
 		move.l			#0,(a2,a1)
@@ -644,9 +644,9 @@ dal1:
 		jsr			draw_lines
 
 		; kopiuj i wypełnij
-		move.l			#buf1,a2
-		move.l			#buf1+WIDTH/8*HEIGHT,a3
-		jsr			copy_and_fill
+		; move.l			#buf1,a2
+		; move.l			#buf1+WIDTH/8*HEIGHT,a3
+		; jsr			copy_and_fill
 
 		rts
 
@@ -716,7 +716,7 @@ lp22:		move.l			pi,a1
 		move.l			d0,(a2,a1)
 		move.l			d1,(a3,a1)
 
-		; jsr		plot
+		; jsr			plot
 		bra			dal2
 poza2:	
 		move.l			#0,(a2,a1)
@@ -731,9 +731,9 @@ dal2:
 		jsr			draw_lines
 
 		; kopiuj i wypełnij
-		move.l			#buf2,a2
-		move.l			#buf2+WIDTH/8*HEIGHT,a3
-		jsr			copy_and_fill
+		; move.l			#buf2,a2
+		; move.l			#buf2+WIDTH/8*HEIGHT,a3
+		; jsr			copy_and_fill
 
 		rts
 
@@ -745,40 +745,32 @@ dal2:
 draw_lines:
 
 		move.l			pxa+00*4,d0
-		beq			ln1
 		move.l			pya+00*4,d1
 		move.l			pxa+01*4,d2
-		beq			ln1
 		move.l			pya+01*4,d3
 		move.l			#LINE_WIDTH,d4
 		jsr			line
 ln1:
 
 		move.l			pxa+01*4,d0
-		beq			ln2
 		move.l			pya+01*4,d1
 		move.l			pxa+03*4,d2
-		beq			ln2
 		move.l			pya+03*4,d3
 		move.l			#LINE_WIDTH,d4
 		jsr			line
 ln2:
 
 		move.l			pxa+03*4,d0
-		beq			ln3
 		move.l			pya+03*4,d1
 		move.l			pxa+02*4,d2
-		beq			ln3
 		move.l			pya+02*4,d3
 		move.l			#LINE_WIDTH,d4
 		jsr			line
 ln3:
 
 		move.l			pxa+02*4,d0
-		beq			ln4
 		move.l			pya+02*4,d1
 		move.l			pxa+00*4,d2
-		beq			ln4
 		move.l			pya+00*4,d3
 		move.l			#LINE_WIDTH,d4
 		jsr			line
@@ -1435,6 +1427,7 @@ cl_scroll_bitplanes_nr:
 ; =============================================================================
 ; MUZA
 ; =============================================================================
+
 		CNOP			0,4
-		include			"fasttracker_player.i"
+		include			"ProTracker_v2.3a.s"
 
