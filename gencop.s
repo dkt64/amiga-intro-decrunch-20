@@ -34,6 +34,8 @@ RES		EQU	8													;8=lores, 4=hires
 
 LINE_WIDTH	EQU	WIDTH/8
 
+RASTER_VECTORS	EQU	$6f
+RASTER_SCROLL	EQU	$ff
 	
 ; =============================================================================
 ; Start programu
@@ -126,59 +128,71 @@ init:
 		move.l			#cl_scroll_bitplanes_nr+2,a0
 		move.w			d0,(a0)
 
-	; bitplan 0
+	; logo bitplan 0
 		move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*00,a0
-		move.l			#cl_scroll_address+2+4*00,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
 		swap			d0
 		move.l			#cl_logo_address+2+4*01,a0
-		move.l			#cl_scroll_address+2+4*01,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
-	; bitplan 1
+	; logo bitplan 1
 		move.l			#logo_bitplanes+1*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*02,a0
-		move.l			#cl_scroll_address+2+4*02,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
 		swap			d0
 		move.l			#cl_logo_address+2+4*03,a0
-		move.l			#cl_scroll_address+2+4*03,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
-	; bitplan 2
+	; logo bitplan 2
 		move.l			#logo_bitplanes+2*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*04,a0
-		move.l			#cl_scroll_address+2+4*04,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
 		swap			d0
 		move.l			#cl_logo_address+2+4*05,a0
-		move.l			#cl_scroll_address+2+4*05,a1
 		move.w			d0,(a0)
-		move.w			d0,(a1)
-	; bitplan 3
+	; logo bitplan 3
 		move.l			#logo_bitplanes+3*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*06,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_logo_address+2+4*07,a0
 		move.w			d0,(a0)
-	; bitplan 4
+	; logo bitplan 4
 		move.l			#logo_bitplanes+4*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*08,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_logo_address+2+4*09,a0
 		move.w			d0,(a0)
-	; bitplan 5
+	; logo bitplan 5
 		move.l			#logo_bitplanes+5*WIDTH/8*HEIGHT,d0
 		move.l			#cl_logo_address+2+4*10,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_logo_address+2+4*11,a0
+		move.w			d0,(a0)
+
+	; scroll bitplan 0
+		move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8*HEIGHT,d0
+		move.l			#cl_scroll_address+2+4*00,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_scroll_address+2+4*01,a0
+		move.w			d0,(a0)
+
+	; scroll bitplan 1
+		move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8*HEIGHT,d0
+		move.l			#cl_scroll_address+2+4*02,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_scroll_address+2+4*03,a0
+		move.w			d0,(a0)
+
+	; scroll bitplan 2
+		move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8*HEIGHT,d0
+		move.l			#cl_scroll_address+2+4*04,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_scroll_address+2+4*05,a0
 		move.w			d0,(a0)
 
 	; kolory logo
@@ -379,28 +393,6 @@ init:
 		move.l			#cl_scroll_colors+2+4*07,a0
 		move.w			d0,(a0)
 
-	; bitplan 0
-		move.l			#buf1+0*WIDTH/8*HEIGHT,d0
-		move.l			#cl_vector_address+2+4*00,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*01,a0
-		move.w			d0,(a0)
-	; bitplan 1
-		move.l			#buf1+1*WIDTH/8*HEIGHT,d0
-		move.l			#cl_vector_address+2+4*02,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*03,a0
-		move.w			d0,(a0)
-	; bitplan 2
-		move.l			#buf1+2*WIDTH/8*HEIGHT,d0
-		move.l			#cl_vector_address+2+4*04,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*05,a0
-		move.w			d0,(a0)
-
 	; =====================================================================
 	; main loop
 	; =====================================================================
@@ -425,21 +417,21 @@ raster:
 		beq			copper_buf2
 
 	; bitplan 0
-		move.l			#buf1+0*WIDTH/8*HEIGHT,d0
+		move.l			#buf1+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*00,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*01,a0
 		move.w			d0,(a0)
 	; bitplan 1
-		move.l			#buf1+1*WIDTH/8*HEIGHT,d0
+		move.l			#buf1+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*02,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*03,a0
 		move.w			d0,(a0)
 	; bitplan 2
-		move.l			#buf1+2*WIDTH/8*HEIGHT,d0
+		move.l			#buf1+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*04,a0
 		move.w			d0,(a0)
 		swap			d0
@@ -451,21 +443,21 @@ raster:
 copper_buf2:
 
 	; bitplan 0
-		move.l			#buf2+0*WIDTH/8*HEIGHT,d0
+		move.l			#buf2+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*00,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*01,a0
 		move.w			d0,(a0)
 	; bitplan 1
-		move.l			#buf2+1*WIDTH/8*HEIGHT,d0
+		move.l			#buf2+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*02,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*03,a0
 		move.w			d0,(a0)
 	; bitplan 2
-		move.l			#buf2+2*WIDTH/8*HEIGHT,d0
+		move.l			#buf2+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*04,a0
 		move.w			d0,(a0)
 		swap			d0
@@ -1317,7 +1309,8 @@ logo_colors:
 
 		CNOP			0,4
 vector_colors:
-		dc.w			$0000,$0fff,$0fff,$0fff,$0fff,$0fff,$0fff,$0fff
+		incbin			"gfx/logo.pal"
+		; dc.w			$0000,$0fff,$0fff,$0fff,$0fff,$0fff,$0fff,$0fff
 
 		CNOP			0,4
 scroll_colors:
@@ -1382,7 +1375,9 @@ cl_logo_colors:
 cl_logo_bitplanes_nr:
 		dc.w			BPLCON0,0
 
-		dc.w			$8001,$ff00										; czekam na raster
+		; vector
+
+		dc.w			RASTER_VECTORS << 8 + 1,$ff00								; czekam na raster
 
 cl_vector_address:
 		dc.w			BPL1PTL,0
@@ -1405,7 +1400,9 @@ cl_vector_colors:
 cl_vector_bitplanes_nr:
 		dc.w			BPLCON0,0
 
-		dc.w			$c001,$ff00										; czekam na raster
+		; scroll
+
+		dc.w			RASTER_SCROLL << 8 + 1,$ff00								; czekam na raster
 
 cl_scroll_address:
 		dc.w			BPL1PTL,0
