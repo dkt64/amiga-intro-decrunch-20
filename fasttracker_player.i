@@ -500,4 +500,4 @@ mt_voice4:		blk.w		13,0
 			dc.w		8
 mt_oldirq:		dc.l		0
 
-mt_data:		incbin		"msx/Sentinel.mod"
+mt_data:		incbin		"msx/TimeSentinel.mod"
