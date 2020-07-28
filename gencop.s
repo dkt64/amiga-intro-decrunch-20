@@ -1313,7 +1313,7 @@ logo_colors:
 		CNOP			0,4
 vector_colors:
 		; incbin			"gfx/logo.pal"
-		dc.w			$0000,$0fff,$0f00,$00f0,$000f,$0fff,$0fff,$0fff
+		dc.w			$0223,$0fff,$0f00,$00f0,$000f,$0fff,$0fff,$0fff
 
 		CNOP			0,4
 scroll_colors:
