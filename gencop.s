@@ -35,10 +35,12 @@ RES			EQU	8											;8=lores, 4=hires
 LINE_WIDTH		EQU	WIDTH/8
 
 RASTER_VECTORS_CL	EQU	$7001
-RASTER_VECTORS		EQU	$10
+RASTER_VECTORS		EQU	$20
 
 RASTER_SCROLL_CL	EQU	$d001
 RASTER_SCROLL		EQU	$f0
+
+PLOTS_NR		equ	14
 	
 ; =============================================================================
 ; Start programu
@@ -544,25 +546,25 @@ my_fx:
 		move.w			d1,zoomz
 		addi.l			#4,d0
 		andi.l			#2047,d0
-		; move.l			d0,zoomz_index
+		move.l			d0,zoomz_index
 
 		clr.l			d1
 		move.l			#zoomx_tab,a0
 		move.l			zoomx_index,d0
 		move.w			(a0,d0),d1
 		ext.l			d1
-		move.l			d1,zoomx
+		; move.l			d1,zoomx
 		addi.l			#2,d0
 		andi.l			#1023,d0
-		; move.l			d0,zoomx_index
+		move.l			d0,zoomx_index
 
-		; addi.l			#4,ax
-		; addi.l			#3,ay
-		; addi.l			#1,az
+		addi.l			#4,ax
+		addi.l			#3,ay
+		addi.l			#3,az
 
-		; andi.l			#1023,ax
-		; andi.l			#1023,ay
-		; andi.l			#1023,az
+		andi.l			#1023,ax
+		andi.l			#1023,ay
+		andi.l			#1023,az
 
 		btst			#1,buf_nr
 		beq			my_fx_buf1
@@ -602,7 +604,7 @@ lp1:		move.l			pi,a1
 		move.l			d1,(a3,a1)
 	
 		addi.l			#4,pi
-		cmpi.l			#4*12,pi
+		cmpi.l			#4*PLOTS_NR,pi
 		bne			lp1
 
 waitb2:		btst			#6,DMACONR
@@ -622,7 +624,7 @@ lp12:		move.l			pi,a1
 		bge			poza1
 
 		addi.l			#160,d0
-		; add.l		zoomx,d0
+		add.l			zoomx,d0
 		bmi			poza1
 		cmpi.l			#320,d0
 		bge			poza1
@@ -636,20 +638,20 @@ lp12:		move.l			pi,a1
 		; jsr			plot
 		bra			dal1
 poza1:
-		move.l			#0,(a2,a1)
-		move.l			#0,(a3,a1)
+		; move.l			#0,(a2,a1)
+		; move.l			#0,(a3,a1)
 dal1:
 		addi.l			#4,pi
-		cmpi.l			#4*12,pi
+		cmpi.l			#4*PLOTS_NR,pi
 		bne			lp12
 
 		move.l			#buf1,a2
 		jsr			draw_lines
 
 		; kopiuj i wypełnij
-		move.l			#buf1,a2
-		move.l			#buf1+WIDTH/8*HEIGHT,a3
-		jsr			copy_and_fill
+		; move.l			#buf1,a2
+		; move.l			#buf1+WIDTH/8*HEIGHT,a3
+		; jsr			copy_and_fill
 
 		rts
 
@@ -687,7 +689,7 @@ lp2:		move.l			pi,a1
 		move.l			d1,(a3,a1)
 
 		addi.l			#4,pi
-		cmpi.l			#4*12,pi
+		cmpi.l			#4*PLOTS_NR,pi
 		bne			lp2
 
 waitb3:		btst			#6,DMACONR
@@ -708,7 +710,7 @@ lp22:		move.l			pi,a1
 		bge			poza2
 
 		addi.l			#160,d0
-		; add.l		zoomx,d0
+		add.l			zoomx,d0
 		bmi			poza2
 		cmpi.l			#320,d0
 		bge			poza2
@@ -722,21 +724,21 @@ lp22:		move.l			pi,a1
 		; jsr			plot
 		bra			dal2
 poza2:	
-		move.l			#0,(a2,a1)
-		move.l			#0,(a3,a1)
+		; move.l			#0,(a2,a1)
+		; move.l			#0,(a3,a1)
 dal2:
 
 		addi.l			#4,pi
-		cmpi.l			#4*12,pi
+		cmpi.l			#4*PLOTS_NR,pi
 		bne			lp22
 
 		move.l			#buf2,a2
 		jsr			draw_lines
 
 		; kopiuj i wypełnij
-		move.l			#buf2,a2
-		move.l			#buf2+WIDTH/8*HEIGHT,a3
-		jsr			copy_and_fill
+		; move.l			#buf2,a2
+		; move.l			#buf2+WIDTH/8*HEIGHT,a3
+		; jsr			copy_and_fill
 
 		rts
 
@@ -747,13 +749,14 @@ dal2:
 
 draw_lines:
 
+		; 1 przód
+
 		move.l			pxa+00*4,d0
 		move.l			pya+00*4,d1
 		move.l			pxa+01*4,d2
 		move.l			pya+01*4,d3
 		move.l			#LINE_WIDTH,d4
 		jsr			line
-ln1:
 
 		move.l			pxa+01*4,d0
 		move.l			pya+01*4,d1
@@ -761,7 +764,6 @@ ln1:
 		move.l			pya+03*4,d3
 		move.l			#LINE_WIDTH,d4
 		jsr			line
-ln2:
 
 		move.l			pxa+03*4,d0
 		move.l			pya+03*4,d1
@@ -769,7 +771,6 @@ ln2:
 		move.l			pya+02*4,d3
 		move.l			#LINE_WIDTH,d4
 		jsr			line
-ln3:
 
 		move.l			pxa+02*4,d0
 		move.l			pya+02*4,d1
@@ -777,9 +778,249 @@ ln3:
 		move.l			pya+00*4,d3
 		move.l			#LINE_WIDTH,d4
 		jsr			line
-ln4:
+
+		; 2 tył
+
+		move.l			pxa+04*4,d0
+		move.l			pya+04*4,d1
+		move.l			pxa+05*4,d2
+		move.l			pya+05*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+05*4,d0
+		move.l			pya+05*4,d1
+		move.l			pxa+07*4,d2
+		move.l			pya+07*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+07*4,d0
+		move.l			pya+07*4,d1
+		move.l			pxa+06*4,d2
+		move.l			pya+06*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+06*4,d0
+		move.l			pya+06*4,d1
+		move.l			pxa+04*4,d2
+		move.l			pya+04*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		; 3 połączenie przód-tył
+
+		move.l			pxa+00*4,d0
+		move.l			pya+00*4,d1
+		move.l			pxa+04*4,d2
+		move.l			pya+04*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+01*4,d0
+		move.l			pya+01*4,d1
+		move.l			pxa+05*4,d2
+		move.l			pya+05*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+02*4,d0
+		move.l			pya+02*4,d1
+		move.l			pxa+06*4,d2
+		move.l			pya+06*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+03*4,d0
+		move.l			pya+03*4,d1
+		move.l			pxa+07*4,d2
+		move.l			pya+07*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		; 4 lewa szpica
+
+		move.l			pxa+00*4,d0
+		move.l			pya+00*4,d1
+		move.l			pxa+08*4,d2
+		move.l			pya+08*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+02*4,d0
+		move.l			pya+02*4,d1
+		move.l			pxa+08*4,d2
+		move.l			pya+08*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+04*4,d0
+		move.l			pya+04*4,d1
+		move.l			pxa+08*4,d2
+		move.l			pya+08*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+06*4,d0
+		move.l			pya+06*4,d1
+		move.l			pxa+08*4,d2
+		move.l			pya+08*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		; 5 prawa szpica
+
+		move.l			pxa+01*4,d0
+		move.l			pya+01*4,d1
+		move.l			pxa+09*4,d2
+		move.l			pya+09*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+03*4,d0
+		move.l			pya+03*4,d1
+		move.l			pxa+09*4,d2
+		move.l			pya+09*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+05*4,d0
+		move.l			pya+05*4,d1
+		move.l			pxa+09*4,d2
+		move.l			pya+09*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+07*4,d0
+		move.l			pya+07*4,d1
+		move.l			pxa+09*4,d2
+		move.l			pya+09*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		; 6 górna szpica
+
+		move.l			pxa+00*4,d0
+		move.l			pya+00*4,d1
+		move.l			pxa+10*4,d2
+		move.l			pya+10*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+01*4,d0
+		move.l			pya+01*4,d1
+		move.l			pxa+10*4,d2
+		move.l			pya+10*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+04*4,d0
+		move.l			pya+04*4,d1
+		move.l			pxa+10*4,d2
+		move.l			pya+10*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+05*4,d0
+		move.l			pya+05*4,d1
+		move.l			pxa+10*4,d2
+		move.l			pya+10*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		; 6 dolna szpica
+
+		move.l			pxa+02*4,d0
+		move.l			pya+02*4,d1
+		move.l			pxa+11*4,d2
+		move.l			pya+11*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+03*4,d0
+		move.l			pya+03*4,d1
+		move.l			pxa+11*4,d2
+		move.l			pya+11*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+06*4,d0
+		move.l			pya+06*4,d1
+		move.l			pxa+11*4,d2
+		move.l			pya+11*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+07*4,d0
+		move.l			pya+07*4,d1
+		move.l			pxa+11*4,d2
+		move.l			pya+11*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		; 6 przednia szpica
+
+		move.l			pxa+00*4,d0
+		move.l			pya+00*4,d1
+		move.l			pxa+12*4,d2
+		move.l			pya+12*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+01*4,d0
+		move.l			pya+01*4,d1
+		move.l			pxa+12*4,d2
+		move.l			pya+12*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+02*4,d0
+		move.l			pya+02*4,d1
+		move.l			pxa+12*4,d2
+		move.l			pya+12*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+03*4,d0
+		move.l			pya+03*4,d1
+		move.l			pxa+12*4,d2
+		move.l			pya+12*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		; 6 tylna szpica
+
+		move.l			pxa+04*4,d0
+		move.l			pya+04*4,d1
+		move.l			pxa+13*4,d2
+		move.l			pya+13*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+05*4,d0
+		move.l			pya+05*4,d1
+		move.l			pxa+13*4,d2
+		move.l			pya+13*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+06*4,d0
+		move.l			pya+06*4,d1
+		move.l			pxa+13*4,d2
+		move.l			pya+13*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
+
+		move.l			pxa+07*4,d0
+		move.l			pya+07*4,d1
+		move.l			pxa+13*4,d2
+		move.l			pya+13*4,d3
+		move.l			#LINE_WIDTH,d4
+		jsr			line
 
 		rts
+
 
 ; =============================================================================
 ; Obrót punktu
@@ -958,14 +1199,15 @@ plot:
 line:
 		movea.l			a2,a0
 
-		cmp.w			d1,d3
-		bpl			line_kier_ok
-		exg			d1,d3
-		exg			d0,d2	
-line_kier_ok:
+; 		cmp.w			d1,d3
+; 		bpl			line_kier_ok
+; 		exg			d1,d3
+; 		exg			d0,d2	
+; line_kier_ok:
 
 		sub.w			d0,d2										; obliczamy różnicę x -> dx
 		bmi			xneg										; jeżeli ujemna to oktant 3,4,5,6
+
 		sub.w			d1,d3										; obliczamy różnicę y calculate dy, dx jest dodatnie więc oktant 1,2,7,8
 		bmi			yneg										; jeżeli dy ujemne oktant 7,8
 		cmp.w			d3,d2										; porównanie dx i dy - rozróżnienie pomiędzy oktantami 1,2
@@ -1007,16 +1249,20 @@ xyneg:
 xynygtx:
 		exg			d2,d3										; x musi być większe od y - zamiana
 		moveq.l			#OCTANT6+LINEMODE,d5								; wybór oktant 6
+
 lineagain:
 	; obliczamy początek (bajt w którym zaczynamy rysować)
-		mulu.w			d4,d1										; Obliczamy y1 * WIDTH
+
 		ror.l			#4,d0										; move upper four bits into hi word
 		add.w			d0,d0										; mnożenie x 2
+
+		mulu.w			d4,d1										; Obliczamy y1 * WIDTH
 		add.l			d1,a0										; ptr += (x1 >> 3)
 		add.w			d0,a0										; ptr += y1 * width
 
 		swap			d0										; get the four bits of x1
 		or.w			#$BFA,d0									; or with USEA, USEC, USED, F=A+C
+
 		lsl.w			#2,d3										; Y = 4 * Y
 		add.w			d2,d2										; X = 2 * X
 		move.w			d2,d1										; set up size word
@@ -1035,7 +1281,7 @@ lineagain:
 		bpl			lineover									; if negative,
 		or.w			#SIGNFLAG,d5									; set sign bit in con1
 lineover:
-		or.w			#2,d5										; SING bit for filling
+		; or.w			#2,d5										; SING bit for filling
 		
 		move.w			d0,BLTCON0(a6)									; write control registers
 		move.w			d5,BLTCON1(a6)
@@ -1057,25 +1303,25 @@ lineover:
 ; a3 - bufor docelowy
 ; =============================================================================
 
-copy_and_fill:
+; copy_and_fill:
 
-		M_BLITTER_WAIT
+; 		M_BLITTER_WAIT
 
-		add.l			#WIDTH/8*HEIGHT,a2
-		add.l			#WIDTH/8*HEIGHT,a3
-		move.l			a2,BLTAPT(a6)
-		move.l			a3,BLTDPT(a6)
-		move.l			#WIDTH/8,BLTAMOD(a6)
-		move.l			#WIDTH/8,BLTDMOD(a6)
-		move.l			#$ffffffff,BLTAFWM(a6)
-		move.w			#$09f0,BLTCON0(a6)
-		move.w			#FILL_OR+BLITREVERSE,BLTCON1(a6)
-		move.l			#HEIGHT,d0
-		lsl.l			#5,d0
-		or.l			#WIDTH/8,d0
-		move.w			d0,BLTSIZE(a6)
+; 		add.l			#WIDTH/8*HEIGHT,a2
+; 		add.l			#WIDTH/8*HEIGHT,a3
+; 		move.l			a2,BLTAPT(a6)
+; 		move.l			a3,BLTDPT(a6)
+; 		move.l			#WIDTH/8,BLTAMOD(a6)
+; 		move.l			#WIDTH/8,BLTDMOD(a6)
+; 		move.l			#$ffffffff,BLTAFWM(a6)
+; 		move.w			#$09f0,BLTCON0(a6)
+; 		move.w			#FILL_XOR+BLITREVERSE,BLTCON1(a6)
+; 		move.l			#HEIGHT,d0
+; 		lsl.l			#5,d0
+; 		or.l			#WIDTH/8,d0
+; 		move.w			d0,BLTSIZE(a6)
 
-		rts
+; 		rts
 
 ; =============================================================================
 ; Czyszczenie bitplanu
@@ -1114,35 +1360,38 @@ zoomz_index:
 pi:		dc.l			0
 
 px:
-		dc.l			-200,200
-		dc.l			-200,200
-		dc.l			-200,200
-		dc.l			-200,200
-		dc.l			-200,200
+		dc.l			-70,70
+		dc.l			-70,70
+		dc.l			-70,70
+		dc.l			-70,70
+		dc.l			-400,400
+		dc.l			0,0
 		dc.l			0,0
 py:
-		dc.l			200,200
-		dc.l			-200,-200
-		dc.l			200,200
-		dc.l			-200,-200
+		dc.l			70,70
+		dc.l			-70,-70
+		dc.l			70,70
+		dc.l			-70,-70
 		dc.l			0,0
-		dc.l			-200,200
+		dc.l			400,-400
+		dc.l			0,0
 pz:
-		dc.l			-200,-200
-		dc.l			-200,-200
-		dc.l			200,200
-		dc.l			200,200
+		dc.l			-70,-70
+		dc.l			-70,-70
+		dc.l			70,70
+		dc.l			70,70
 		dc.l			0,0
 		dc.l			0,0
+		dc.l			-400,400
 
 pxa:
-		blk.l			12,0
+		blk.l			14,0
 pya:
-		blk.l			12,0
+		blk.l			14,0
 
-ax:		dc.l			440
-ay:		dc.l			440
-az:		dc.l			440
+ax:		dc.l			0
+ay:		dc.l			0
+az:		dc.l			0
 
 sinus:	
 		dc.w			0,2,4,6,8,10,11,13,15,17,19,21,23,24,26,28
@@ -1303,8 +1552,6 @@ logo_bitplanes:
 		incbin			"gfx/logo.raw"
 
 		CNOP			0,4
-
-		CNOP			0,4
 buf1:
 		blk.b			3*WIDTH/8*HEIGHT,0
 
@@ -1319,7 +1566,7 @@ logo_colors:
 		CNOP			0,4
 vector_colors:
 		; incbin			"gfx/logo.pal"
-		dc.w			$0223,$0fff,$0000,$00f0,$000f,$0fff,$0fff,$0fff
+		dc.w			$0223,$0f4c,$0000,$00f0,$000f,$0fff,$0fff,$0fff
 
 		CNOP			0,4
 scroll_colors:
