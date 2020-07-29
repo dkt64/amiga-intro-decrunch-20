@@ -35,7 +35,7 @@ RES			EQU	8											;8=lores, 4=hires
 LINE_WIDTH		EQU	WIDTH/8
 
 RASTER_VECTORS_CL	EQU	$7001
-RASTER_VECTORS		EQU	$50
+RASTER_VECTORS		EQU	$10
 
 RASTER_SCROLL_CL	EQU	$d001
 RASTER_SCROLL		EQU	$f0
@@ -544,7 +544,7 @@ my_fx:
 		move.w			d1,zoomz
 		addi.l			#4,d0
 		andi.l			#2047,d0
-		move.l			d0,zoomz_index
+		; move.l			d0,zoomz_index
 
 		clr.l			d1
 		move.l			#zoomx_tab,a0
@@ -552,10 +552,9 @@ my_fx:
 		move.w			(a0,d0),d1
 		ext.l			d1
 		move.l			d1,zoomx
-
 		addi.l			#2,d0
 		andi.l			#1023,d0
-		move.l			d0,zoomx_index
+		; move.l			d0,zoomx_index
 
 		; addi.l			#4,ax
 		; addi.l			#3,ay
@@ -648,9 +647,9 @@ dal1:
 		jsr			draw_lines
 
 		; kopiuj i wypełnij
-		; move.l			#buf1,a2
-		; move.l			#buf1+WIDTH/8*HEIGHT,a3
-		; jsr			copy_and_fill
+		move.l			#buf1,a2
+		move.l			#buf1+WIDTH/8*HEIGHT,a3
+		jsr			copy_and_fill
 
 		rts
 
@@ -735,9 +734,9 @@ dal2:
 		jsr			draw_lines
 
 		; kopiuj i wypełnij
-		; move.l			#buf2,a2
-		; move.l			#buf2+WIDTH/8*HEIGHT,a3
-		; jsr			copy_and_fill
+		move.l			#buf2,a2
+		move.l			#buf2+WIDTH/8*HEIGHT,a3
+		jsr			copy_and_fill
 
 		rts
 
@@ -1070,7 +1069,7 @@ copy_and_fill:
 		move.l			#WIDTH/8,BLTDMOD(a6)
 		move.l			#$ffffffff,BLTAFWM(a6)
 		move.w			#$09f0,BLTCON0(a6)
-		move.w			#FILL_XOR+BLITREVERSE,BLTCON1(a6)
+		move.w			#FILL_OR+BLITREVERSE,BLTCON1(a6)
 		move.l			#HEIGHT,d0
 		lsl.l			#5,d0
 		or.l			#WIDTH/8,d0
@@ -1141,9 +1140,9 @@ pxa:
 pya:
 		blk.l			12,0
 
-ax:		dc.l			0
-ay:		dc.l			0
-az:		dc.l			0
+ax:		dc.l			440
+ay:		dc.l			440
+az:		dc.l			440
 
 sinus:	
 		dc.w			0,2,4,6,8,10,11,13,15,17,19,21,23,24,26,28
