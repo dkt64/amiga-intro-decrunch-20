@@ -1,39 +1,39 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"amiga-assembly.cstool": "bin/cstool",
-		"amiga-assembly.vasm": {
-			"enabled": true,
-			"file": "bin/vasmm68k_mot",
-			"options": [
-				"-m68000",
-				"-Fhunk",
-				"-linedebug"
-			]
-		},
-		"amiga-assembly.vlink": {
-			"enabled": true,
-			"file": "bin/vlink",
-			"includes": "*.s",
-			"excludes": "",
-			"exefilename": "../fs-uae/hd0/gencop",
-			"options": [
-				"-bamigahunk",
-				"-Bstatic"
-			]
-		},
-		"amiga-assembly.adfgenerator": {
-			"ADFToolsParentDir": "bin",
-			"sourceRootDir": "fs-uae/hd0",
-			"outputADFFile": "./build/disk.adf",
-			"includes": "**/*",
-			"excludes": "**/.*"
-		},
-		"editor.formatOnSave": true,
-		"amiga-assembly.format.useTabs": true
-	}
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "amiga-assembly.cstool": "bin/cstool",
+    "amiga-assembly.vasm": {
+      "enabled": true,
+      "file": "bin/vasmm68k_mot",
+      "options": [
+        "-kick1hunks",
+        "-Fhunkexe",
+        "-nosym"
+        // "-m68000",
+        // "-Fhunk",
+        // "-linedebug"
+      ]
+    },
+    "amiga-assembly.vlink": {
+      "enabled": true,
+      "file": "bin/vlink",
+      "includes": "*.s",
+      "excludes": "",
+      "exefilename": "../fs-uae/hd0/gencop",
+      "options": ["-bamigahunk", "-Bstatic"]
+    },
+    "amiga-assembly.adfgenerator": {
+      "ADFToolsParentDir": "bin",
+      "sourceRootDir": "fs-uae/hd0",
+      "outputADFFile": "./build/disk.adf",
+      "includes": "**/*",
+      "excludes": "**/.*"
+    },
+    "editor.formatOnSave": true,
+    "amiga-assembly.format.useTabs": true
+  }
 }
