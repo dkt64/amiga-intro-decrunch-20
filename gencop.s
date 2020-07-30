@@ -38,7 +38,7 @@ RASTER_VECTORS_CL	EQU	$7001
 RASTER_VECTORS		EQU	$70-$50
 
 RASTER_SCROLL_CL	EQU	$fe01
-RASTER_SCROLL_SIZE	EQU	$30
+RASTER_SCROLL_SIZE	EQU	$50
 RASTER_SCROLL		EQU	$fe-RASTER_SCROLL_SIZE
 
 PLOTS_NR		equ	14
@@ -123,7 +123,7 @@ init:
 
 	; ilość bitplanów
 
-		move.w			#$6200,d0
+		move.w			#$5200,d0
 		move.l			#cl_logo_bitplanes_nr+2,a0
 		move.w			d0,(a0)
 
@@ -131,7 +131,7 @@ init:
 		move.l			#cl_vector_bitplanes_nr+2,a0
 		move.w			d0,(a0)
 
-		move.w			#$6200,d0
+		move.w			#$4200,d0
 		move.l			#cl_scroll_bitplanes_nr+2,a0
 		move.w			d0,(a0)
 
@@ -170,13 +170,6 @@ init:
 		swap			d0
 		move.l			#cl_logo_address+2+4*09,a0
 		move.w			d0,(a0)
-	; logo bitplan 5
-		move.l			#logo_bitplanes+5*WIDTH/8*HEIGHT,d0
-		move.l			#cl_logo_address+2+4*10,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_logo_address+2+4*11,a0
-		move.w			d0,(a0)
 
 	; scroll bitplan 0
 		move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d0
@@ -208,22 +201,6 @@ init:
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_scroll_address+2+4*07,a0
-		move.w			d0,(a0)
-
-	; scroll bitplan 4
-		move.l			#logo_bitplanes+4*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d0
-		move.l			#cl_scroll_address+2+4*08,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_scroll_address+2+4*09,a0
-		move.w			d0,(a0)
-
-	; scroll bitplan 5
-		move.l			#logo_bitplanes+5*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d0
-		move.l			#cl_scroll_address+2+4*10,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_scroll_address+2+4*11,a0
 		move.w			d0,(a0)
 
 	; kolory logo
@@ -422,6 +399,38 @@ init:
 
 		move.w			scroll_colors+2*07,d0
 		move.l			#cl_scroll_colors+2+4*07,a0
+		move.w			d0,(a0)
+
+		move.w			scroll_colors+2*08,d0
+		move.l			#cl_scroll_colors+2+4*08,a0
+		move.w			d0,(a0)
+
+		move.w			scroll_colors+2*09,d0
+		move.l			#cl_scroll_colors+2+4*09,a0
+		move.w			d0,(a0)
+
+		move.w			scroll_colors+2*10,d0
+		move.l			#cl_scroll_colors+2+4*10,a0
+		move.w			d0,(a0)
+
+		move.w			scroll_colors+2*11,d0
+		move.l			#cl_scroll_colors+2+4*11,a0
+		move.w			d0,(a0)
+
+		move.w			scroll_colors+2*12,d0
+		move.l			#cl_scroll_colors+2+4*12,a0
+		move.w			d0,(a0)
+
+		move.w			scroll_colors+2*13,d0
+		move.l			#cl_scroll_colors+2+4*13,a0
+		move.w			d0,(a0)
+
+		move.w			scroll_colors+2*14,d0
+		move.l			#cl_scroll_colors+2+4*14,a0
+		move.w			d0,(a0)
+
+		move.w			scroll_colors+2*15,d0
+		move.l			#cl_scroll_colors+2+4*15,a0
 		move.w			d0,(a0)
 
 	; =====================================================================
@@ -1618,10 +1627,6 @@ oldadkcon:
 gfxname: 	
 		dc.b			'graphics.library',0
 
-		CNOP			0,4
-fonts:	
-		incbin			"gfx/fonts.raw"
-
 ; =============================================================================
 ; CHIP RAM
 ; =============================================================================
@@ -1631,6 +1636,11 @@ fonts:
 ; -----------------------------------------------------------------------------
 ; Bitmapa
 ; -----------------------------------------------------------------------------
+
+		CNOP			0,4
+fonts:	
+		incbin			"gfx/fonts.raw"
+
 		CNOP			0,4
 logo_bitplanes:	
 		incbin			"gfx/logo.raw"
@@ -1676,8 +1686,6 @@ cl_logo_address:
 		dc.w			BPL4PTH,0
 		dc.w			BPL5PTL,0
 		dc.w			BPL5PTH,0
-		dc.w			BPL6PTL,0
-		dc.w			BPL6PTH,0
 
 cl_logo_colors:
 		dc.w			COLOR00,0
@@ -1756,10 +1764,6 @@ cl_scroll_address:
 		dc.w			BPL3PTH,0
 		dc.w			BPL4PTL,0
 		dc.w			BPL4PTH,0
-		dc.w			BPL5PTL,0
-		dc.w			BPL5PTH,0
-		dc.w			BPL6PTL,0
-		dc.w			BPL6PTH,0
 
 cl_scroll_colors:
 		dc.w			COLOR00,0
@@ -1778,22 +1782,6 @@ cl_scroll_colors:
 		dc.w			COLOR13,0
 		dc.w			COLOR14,0
 		dc.w			COLOR15,0
-		dc.w			COLOR16,0
-		dc.w			COLOR17,0
-		dc.w			COLOR18,0
-		dc.w			COLOR19,0
-		dc.w			COLOR20,0
-		dc.w			COLOR21,0
-		dc.w			COLOR22,0
-		dc.w			COLOR23,0
-		dc.w			COLOR24,0
-		dc.w			COLOR25,0
-		dc.w			COLOR26,0
-		dc.w			COLOR27,0
-		dc.w			COLOR28,0
-		dc.w			COLOR29,0
-		dc.w			COLOR30,0
-		dc.w			COLOR31,0
 
 cl_scroll_bitplanes_nr:
 		dc.w			BPLCON0,0
