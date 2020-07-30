@@ -21,7 +21,7 @@
         "--chip_memory=512",
         "--hard_drive_0=${workspaceFolder}/fs-uae/hd0",
         "--joystick_port_1=none",
-        "--amiga_model=A1200",
+        "--amiga_model=A500",
         "--slow_memory=512",
         "--floppy_drive_volume_empty=0"
       ]
@@ -51,7 +51,7 @@
         "--chip_memory=512",
         "--hard_drive_0=${workspaceFolder}/fs-uae/hd0",
         "--joystick_port_1=none",
-        "--amiga_model=A1200",
+        "--amiga_model=A500",
         "--slow_memory=512",
         "--remote_debugger=200",
         "--use_remote_debugger=true",

@@ -35,7 +35,7 @@ RES			EQU	8											;8=lores, 4=hires
 LINE_WIDTH		EQU	WIDTH/8
 
 RASTER_VECTORS_CL	EQU	$7001
-RASTER_VECTORS		EQU	$70-$48
+RASTER_VECTORS		EQU	$70
 
 RASTER_SCROLL_CL	EQU	$fe01
 RASTER_SCROLL_SIZE	EQU	$48
@@ -91,7 +91,6 @@ init:
 	; ---------------------------------------------------------------------
 
 		jsr			mt_init
-		; jsr			P61_Init									; mt_init
 
 	; ---------------------------------------------------------------------
 	; konfiuracja ekranu
@@ -573,9 +572,9 @@ my_fx:
 		; andi.l			#1023,d0
 		; move.l			d0,zoomx_index
 
-		addi.l			#4,ax
-		addi.l			#3,ay
-		addi.l			#3,az
+		addi.l			#3,ax
+		addi.l			#4,ay
+		addi.l			#5,az
 
 		andi.l			#1023,ax
 		andi.l			#1023,ay
@@ -600,7 +599,7 @@ lp1:		move.l			pi,a1
 
 		addi.l			#160,d0
 		add.l			zoomx,d0
-		addi.l			#128,d1
+		addi.l			#80,d1
 
 		move.l			pi,a1
 		move.l			#pxa,a2
@@ -621,7 +620,7 @@ lp1:		move.l			pi,a1
 		jsr			clear
 		jsr			draw_lines
 
-		addi.l			#1,buf_index
+		addi.l			#4,buf_index
 		cmpi.l			#buf_index_max,buf_index
 		bne			b1
 		move.l			#0,buf_index
@@ -1463,7 +1462,7 @@ logo_bitplanes:
 
 		CNOP			0,4
 buf:
-		blk.b			4*WIDTH/8*HEIGHT,0
+		blk.b			5*WIDTH/8*HEIGHT,0
 
 		CNOP			0,4
 logo_colors:	
@@ -1472,7 +1471,7 @@ logo_colors:
 		CNOP			0,4
 vector_colors:
 		; dc.w			$0223,$0fff,$0ccc,$0ccc,$0aaa,$0aaa,$0aaa,$0aaa
-		dc.w			$0223,$0333,$0555,$0777,$0999,$0bbb,$0ddd,$0fff
+		dc.w			$0223,$0622,$0744,$0866,$0988,$0aaa,$0ccc,$0eee
 
 		CNOP			0,4
 scroll_colors:
@@ -1601,8 +1600,9 @@ cl_scroll_bitplanes_nr:
 
 		CNOP			0,4
 
+buf_index_max		EQU	16
+
 buf_index:	dc.l			0
-buf_index_max		EQU	4
 
 buf_tab:
 		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
@@ -1633,6 +1633,5 @@ buf_tab_bitplane2:
 ; =============================================================================
 
 		CNOP			0,4
-		; include			"610.4.asm"
 		include			"ProTracker_v2.3a.s"
 
