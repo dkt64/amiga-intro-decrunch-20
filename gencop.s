@@ -466,68 +466,35 @@ raster:
 		bne			raster
 
 	; ---------------------------------------------------------------------
-	; wybór bufora
+	; ustawienie adresów dla bitplanów vectora
 	; ---------------------------------------------------------------------
 
-	; w zależności od bufora
-		btst			#1,buf_nr
-		beq			copper_buf2
+		move.l			buf_index,d1
 
 	; bitplan 0
-		move.l			#buf1+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
-		; move.l			#buf1+0*WIDTH/8*HEIGHT,d0
+		move.l			#buf_tab_bitplane0,a0
+		move.l			(a0,d1),d0
 		move.l			#cl_vector_address+2+4*00,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*01,a0
 		move.w			d0,(a0)
 	; bitplan 1
-		move.l			#buf1+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
-		; move.l			#buf1+1*WIDTH/8*HEIGHT,d0
+		move.l			#buf_tab_bitplane1,a0
+		move.l			(a0,d1),d0
 		move.l			#cl_vector_address+2+4*02,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*03,a0
 		move.w			d0,(a0)
 	; bitplan 2
-		move.l			#buf1+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
-		; move.l			#buf2+2*WIDTH/8*HEIGHT,d0
+		move.l			#buf_tab_bitplane2,a0
+		move.l			(a0,d1),d0
 		move.l			#cl_vector_address+2+4*04,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*05,a0
 		move.w			d0,(a0)
-
-		jmp			copper_buf0
-
-copper_buf2:
-
-	; bitplan 0
-		move.l			#buf2+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
-		; move.l			#buf2+0*WIDTH/8*HEIGHT,d0
-		move.l			#cl_vector_address+2+4*00,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*01,a0
-		move.w			d0,(a0)
-	; bitplan 1
-		move.l			#buf2+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
-		; move.l			#buf2+1*WIDTH/8*HEIGHT,d0
-		move.l			#cl_vector_address+2+4*02,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*03,a0
-		move.w			d0,(a0)
-	; bitplan 2
-		move.l			#buf2+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
-		; move.l			#buf2+2*WIDTH/8*HEIGHT,d0
-		move.l			#cl_vector_address+2+4*04,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*05,a0
-		move.w			d0,(a0)
-
-copper_buf0:
 
 	; ---------------------------------------------------------------------
 	; uruchomienie copperlisty
@@ -540,8 +507,6 @@ copper_buf0:
 	; ---------------------------------------------------------------------
 
 		jsr			mt_music
-		; jsr			P61_Music									; mt_music
-
 		lea			CUSTOM,a6									; przywracamy CUSTOM
 
 	; ---------------------------------------------------------------------
@@ -549,7 +514,6 @@ copper_buf0:
 	; ---------------------------------------------------------------------
 
 		jsr			my_fx
-		bchg			#1,buf_nr
 
 	; ---------------------------------------------------------------------
 	; sprawdzenie myszki i joya (wyjście z programu)
@@ -599,15 +563,15 @@ my_fx:
 		andi.l			#2047,d0
 		move.l			d0,zoomz_index
 
-		clr.l			d1
-		move.l			#zoomx_tab,a0
-		move.l			zoomx_index,d0
-		move.w			(a0,d0),d1
-		ext.l			d1
+		; clr.l			d1
+		; move.l			#zoomx_tab,a0
+		; move.l			zoomx_index,d0
+		; move.w			(a0,d0),d1
+		; ext.l			d1
 		; move.l			d1,zoomx
-		addi.l			#2,d0
-		andi.l			#1023,d0
-		move.l			d0,zoomx_index
+		; addi.l			#2,d0
+		; andi.l			#1023,d0
+		; move.l			d0,zoomx_index
 
 		addi.l			#4,ax
 		addi.l			#3,ay
@@ -617,16 +581,7 @@ my_fx:
 		andi.l			#1023,ay
 		andi.l			#1023,az
 
-		btst			#1,buf_nr
-		beq			my_fx_buf1
-		jmp			my_fx_buf2
-
-; =============================================================================
-; Efekt bufor 1
-; =============================================================================
-
-my_fx_buf1:
-
+		; obroty punktów + presp
 		
 		move.l			#0,pi
 lp1:		move.l			pi,a1
@@ -657,75 +612,20 @@ lp1:		move.l			pi,a1
 		cmpi.l			#4*PLOTS_NR,pi
 		bne			lp1
 
+		; czyszczenie i rysowanie
+
 		move.l			buf_index,d0
-		move.l			#buf1_tab,a0
+		move.l			#buf_tab,a0
 		move.l			(a0,d0),a2
 		move.l			#WIDTH/8*HEIGHT,d1
 		jsr			clear
 		jsr			draw_lines
-
-		jsr			buf_index_inc
-
-		rts
-
-; =============================================================================
-; Efekt bufor 2
-; =============================================================================
-
-my_fx_buf2:
-
-		move.l			#0,pi
-lp2:		move.l			pi,a1
-		move.l			#px,a0
-		move.l			(a0,a1),d0
-		move.l			#py,a0
-		move.l			(a0,a1),d1
-		move.l			#pz,a0
-		move.l			(a0,a1),d2
-
-		move.l			#sinus,a0
-		move.l			#cosinus,a1
-
-		jsr			rotate
-		jsr			persp
-
-		addi.l			#160,d0
-		add.l			zoomx,d0
-		addi.l			#128,d1
-
-		move.l			pi,a1
-		move.l			#pxa,a2
-		move.l			d0,(a2,a1)
-		move.l			#pya,a3
-		move.l			d1,(a3,a1)
-
-		addi.l			#4,pi
-		cmpi.l			#4*PLOTS_NR,pi
-		bne			lp2
-
-		move.l			buf_index,d0
-		move.l			#buf2_tab,a0
-		move.l			(a0,d0),a2
-		move.l			#WIDTH/8*HEIGHT,d1
-		jsr			clear
-		jsr			draw_lines
-
-		jsr			buf_index_inc
-		rts
-
-; =============================================================================
-; Draw lines
-; Input:  d0=x1 d1=y1 d2=x2 d3=y2 d4=width a0=aptr
-; =============================================================================
-
-buf_index_inc:
 
 		addi.l			#1,buf_index
 		cmpi.l			#buf_index_max,buf_index
 		bne			b1
 		move.l			#0,buf_index
 b1:
-
 		rts
 
 ; =============================================================================
@@ -1152,23 +1052,23 @@ persp:
 ; adres bitplanu w a0
 ; =============================================================================
 
-plot:
+; plot:
 
-		move.l			#tab,a1
+; 		move.l			#tab,a1
 	
-		move.l			d0,d2
-		andi.l			#7,d2
+; 		move.l			d0,d2
+; 		andi.l			#7,d2
 
-		lsr.l			#3,d0
-		mulu			#WIDTH/8,d1
-		add.l			d1,d0
+; 		lsr.l			#3,d0
+; 		mulu			#WIDTH/8,d1
+; 		add.l			d1,d0
 
-		move.b			(a1,d2),d4
-		move.b			(a0,d0),d5
-		or.b			d4,d5
-		move.b			d5,(a0,d0)
+; 		move.b			(a1,d2),d4
+; 		move.b			(a0,d0),d5
+; 		or.b			d4,d5
+; 		move.b			d5,(a0,d0)
 
-		rts
+; 		rts
 
 ; =============================================================================
 ; Rysowanie planu
@@ -1184,12 +1084,6 @@ plot:
 
 line:
 		movea.l			a2,a0
-
-; 		cmp.w			d1,d3
-; 		bpl			line_kier_ok
-; 		exg			d1,d3
-; 		exg			d0,d2	
-; line_kier_ok:
 
 		sub.w			d0,d2										; obliczamy różnicę x -> dx
 		bmi			xneg										; jeżeli ujemna to oktant 3,4,5,6
@@ -1358,8 +1252,8 @@ AdrMulTab
 		CNOP			0,4
 buf_nr		dc.b			0
 
-		CNOP			0,4
-tab:		dc.b			$80,$40,$20,$10,$08,$04,$02,$01
+; 		CNOP			0,4
+; tab:		dc.b			$80,$40,$20,$10,$08,$04,$02,$01
 
 		CNOP			0,4
 zoomx:		dc.l			0
@@ -1568,12 +1462,8 @@ logo_bitplanes:
 		incbin			"gfx/SAMAR_logo_32col.raw"
 
 		CNOP			0,4
-buf1:
-		blk.b			3*WIDTH/8*HEIGHT,0
-
-		CNOP			0,4
-buf2:
-		blk.b			3*WIDTH/8*HEIGHT,0
+buf:
+		blk.b			4*WIDTH/8*HEIGHT,0
 
 		CNOP			0,4
 logo_colors:	
@@ -1581,7 +1471,8 @@ logo_colors:
 
 		CNOP			0,4
 vector_colors:
-		dc.w			$0223,$0f4c,$0f00,$00f0,$000f,$0ff0,$0f0f,$00ff
+		; dc.w			$0223,$0fff,$0ccc,$0ccc,$0aaa,$0aaa,$0aaa,$0aaa
+		dc.w			$0223,$0333,$0555,$0777,$0999,$0bbb,$0ddd,$0fff
 
 		CNOP			0,4
 scroll_colors:
@@ -1711,15 +1602,31 @@ cl_scroll_bitplanes_nr:
 		CNOP			0,4
 
 buf_index:	dc.l			0
-buf_index_max		EQU	3
+buf_index_max		EQU	4
 
-buf1_tab:	dc.l			buf1+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf1+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf1+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+buf_tab:
+		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
 
-buf2_tab:	dc.l			buf2+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf2+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf2+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+buf_tab_bitplane0:
+		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+
+buf_tab_bitplane1:
+		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+
+buf_tab_bitplane2:
+		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
 
 ; =============================================================================
 ; MUZA
