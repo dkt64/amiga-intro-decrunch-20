@@ -1,4 +1,11 @@
-amigeconv.exe -f bitplane -d 5 logo.png logo.raw
-amigeconv.exe -f palette -c 32 -p loadrgb4 logo.png logo.pal
-amigeconv.exe -f bitplane -d 4 fonts.png fonts.raw
-amigeconv.exe -f palette -c 16 -p loadrgb4 fonts.png fonts.pal
+amigeconv.exe -f bitplane -d 5 SAMAR_logo_32col.png SAMAR_logo_32col.raw
+amigeconv.exe -f palette -c 32 -p loadrgb4 SAMAR_logo_32col.png SAMAR_logo_32col.pal
+
+amigeconv.exe -f bitplane -d 4 SAMAR_logo_16col.png SAMAR_logo_16col.raw
+amigeconv.exe -f palette -c 16 -p loadrgb4 SAMAR_logo_16col.png SAMAR_logo_16col.pal
+
+amigeconv.exe -f bitplane -d 4 fonts16_16col.png fonts16_16col.raw
+amigeconv.exe -f palette -c 16 -p loadrgb4 fonts16_16col.png fonts16_16col.pal
+
+amigeconv.exe -f bitplane -d 3 fonts16_8col.png fonts16_8col.raw
+amigeconv.exe -f palette -c 8 -p loadrgb4 fonts16_8col.png fonts16_8col.pal
