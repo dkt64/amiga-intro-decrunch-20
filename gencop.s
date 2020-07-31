@@ -36,7 +36,6 @@ RES			EQU	8									;8=lores, 4=hires
 LINE_WIDTH		EQU	WIDTH/8
 
 RASTER_VECTORS_CL	EQU	$7001
-RASTER_VECTORS		EQU	$70
 
 PLOTS_NR		equ	14
 
@@ -303,21 +302,21 @@ init:
 		move.w			d0,(a0)
 
 	; bitplan 3
-		move.l			#buf+4*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
+		move.l			#buf+4*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*02,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*03,a0
 		move.w			d0,(a0)
 	; bitplan 4
-		move.l			#buf+5*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
+		move.l			#buf+5*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*06,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*07,a0
 		move.w			d0,(a0)
 	; bitplan 5
-		move.l			#buf+6*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
+		move.l			#buf+6*WIDTH/8*HEIGHT,d0
 		move.l			#cl_vector_address+2+4*10,a0
 		move.w			d0,(a0)
 		swap			d0
@@ -406,10 +405,10 @@ init:
 		; move.l			#WIDTH/8*HEIGHT,d2
 		; jsr			copy
 
-		move.l			#fonts+2*WIDTH/8*HEIGHT,d0
-		move.l			#buf+6*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d1
-		move.l			#WIDTH/8*HEIGHT,d2
-		jsr			copy
+		; move.l			#fonts+2*WIDTH/8*HEIGHT+WIDTH/16+2,d0
+		; move.l			#buf+6*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d1
+		; move.l			#WIDTH/8*HEIGHT,d2
+		; jsr			copy
 
 mainloop:
 
@@ -1265,28 +1264,28 @@ buf_index_max		EQU	16
 buf_index:	dc.l			0
 
 buf_tab:
-		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+0*WIDTH/8*HEIGHT
+		dc.l			buf+1*WIDTH/8*HEIGHT
+		dc.l			buf+2*WIDTH/8*HEIGHT
+		dc.l			buf+3*WIDTH/8*HEIGHT
 
 buf_tab_bitplane0:
-		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+1*WIDTH/8*HEIGHT
+		dc.l			buf+2*WIDTH/8*HEIGHT
+		dc.l			buf+3*WIDTH/8*HEIGHT
+		dc.l			buf+0*WIDTH/8*HEIGHT
 
 buf_tab_bitplane1:
-		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+2*WIDTH/8*HEIGHT
+		dc.l			buf+3*WIDTH/8*HEIGHT
+		dc.l			buf+0*WIDTH/8*HEIGHT
+		dc.l			buf+1*WIDTH/8*HEIGHT
 
 buf_tab_bitplane2:
-		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+3*WIDTH/8*HEIGHT
+		dc.l			buf+0*WIDTH/8*HEIGHT
+		dc.l			buf+1*WIDTH/8*HEIGHT
+		dc.l			buf+2*WIDTH/8*HEIGHT
 
 
 ; -----------------------------------------------------------------------------
@@ -1335,6 +1334,9 @@ fonts:
 logo_bitplanes:
 		incbin			"gfx/SAMAR_logo_32col.raw"
 
+empty_buf1:
+		blk.b			WIDTH/8*HEIGHT,0
+
 		CNOP			0,4
 buf:
 		blk.b			WIDTH/8*HEIGHT,0
@@ -1345,18 +1347,12 @@ buf3:
 buf4:
 		blk.b			WIDTH/8*HEIGHT,0
 
-		; blk.b			WIDTH/8*RASTER_VECTORS,0
-
-		; incbin			"gfx/fonty.raw"
-buf5:
-		blk.b			WIDTH/8*HEIGHT,0
-buf6:
-		blk.b			WIDTH/8*HEIGHT,0
-buf7:
-		blk.b			WIDTH/8*HEIGHT,0
+fonty_bitplanes:
+		incbin			"gfx/fonty.raw"
 
 	; bufor żeby nie nachodziło na dalsze regiony
-		blk.b			WIDTH/8*RASTER_VECTORS,0
+empty_buf2:
+		blk.b			WIDTH/8*HEIGHT,0
 
 		CNOP			0,4
 logo_colors:	
@@ -1385,6 +1381,8 @@ cl_logo_address:
 		dc.w			BPL4PTH,0
 		dc.w			BPL5PTL,0
 		dc.w			BPL5PTH,0
+		dc.w			BPL6PTL,0
+		dc.w			BPL6PTH,0
 
 cl_logo_colors:
 		dc.w			COLOR00,0
@@ -1424,21 +1422,7 @@ cl_logo_bitplanes_nr:
 		dc.w			BPLCON0,0
 
 		; --- vector ---
-		dc.w			RASTER_VECTORS_CL,$ff00						; czekam na raster
-
-cl_vector_address:
-		dc.w			BPL1PTL,0
-		dc.w			BPL1PTH,0
-		dc.w			BPL2PTL,0
-		dc.w			BPL2PTH,0
-		dc.w			BPL3PTL,0
-		dc.w			BPL3PTH,0
-		dc.w			BPL4PTL,0
-		dc.w			BPL4PTH,0
-		dc.w			BPL5PTL,0
-		dc.w			BPL5PTH,0
-		dc.w			BPL6PTL,0
-		dc.w			BPL6PTH,0
+		dc.w			RASTER_VECTORS_CL-2,$ff00					; czekam na raster
 
 cl_vector_colors:
 		dc.w			COLOR00,0
@@ -1458,8 +1442,24 @@ cl_vector_colors:
 		dc.w			COLOR14,0
 		dc.w			COLOR15,0
 
+		dc.w			RASTER_VECTORS_CL,$ff00						; czekam na raster
+
 cl_vector_bitplanes_nr:
 		dc.w			BPLCON0,0
+
+cl_vector_address:
+		dc.w			BPL1PTL,0
+		dc.w			BPL1PTH,0
+		dc.w			BPL2PTL,0
+		dc.w			BPL2PTH,0
+		dc.w			BPL3PTL,0
+		dc.w			BPL3PTH,0
+		dc.w			BPL4PTL,0
+		dc.w			BPL4PTH,0
+		dc.w			BPL5PTL,0
+		dc.w			BPL5PTH,0
+		dc.w			BPL6PTL,0
+		dc.w			BPL6PTH,0
 
 		dc.l			$fffffffe							; tymczasowo
 
