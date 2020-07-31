@@ -12,6 +12,7 @@
 		INCLUDE			"hardware/cia.i"
 		INCLUDE			"hardware/blit.i"
 		INCLUDE			"hardware/dmabits.i"
+		INCLUDE			"graphics/display.i"
 
 		INCLUDE			"my_macros.i"
 
@@ -30,19 +31,19 @@ YSTOP			EQU	44+256
 HSTRT			EQU	129
 WIDTH			EQU	320
 HEIGHT			EQU	256
-RES			EQU	8											;8=lores, 4=hires
+RES			EQU	8									;8=lores, 4=hires
 
 LINE_WIDTH		EQU	WIDTH/8
 
 RASTER_VECTORS_CL	EQU	$7001
 RASTER_VECTORS		EQU	$70
 
-RASTER_SCROLL_CL	EQU	$fe01
-RASTER_SCROLL_SIZE	EQU	$48
-RASTER_SCROLL		EQU	$fe-RASTER_SCROLL_SIZE
-
 PLOTS_NR		equ	14
-	
+
+BACKGROUND_COLOR	equ	$0223
+
+; DEBUG_COLORS		EQU	1
+
 ; =============================================================================
 ; Start programu
 ; =============================================================================
@@ -98,40 +99,33 @@ init:
 
 		lea			CUSTOM,a6
 
-		move.w			#$0000,BPLCON0(a6)								; ilość bitplanów
-		move.w			#$0000,BPLCON1(a6)								; poziomy skrol = 0
-		move.w			#$0000,BPL1MOD(a6)								; modulo1
-		move.w			#$0000,BPL2MOD(a6)								; modulo2
-		move.w			#(XSTRT+(YSTRT*256)),DIWSTRT(a6)						; DIWSTRT - górny-lewy róg ekranu (2c81)
-		move.w			#((XSTOP-256)+(YSTOP-256)*256),DIWSTOP(a6)					; DIWSTOP - dolny-prawy róg ekranu (c8d1)
-		move.w			#(HSTRT/2-RES),DDFSTRT(a6)							; DDFSTRT
-		move.w			#((HSTRT/2-RES)+(8*((WIDTH/16)-1))),DDFSTOP(a6)					; DDFSTOP
+		move.w			#$0000,BPLCON0(a6)						; ilość bitplanów
+		move.w			#$0000,BPLCON1(a6)						; poziomy skrol = 0
+		move.w			#PF2PRI,BPLCON2(a6)						; playfield 2 z przodu
+		move.w			#$0000,BPL1MOD(a6)						; modulo1
+		move.w			#$0000,BPL2MOD(a6)						; modulo2
+		move.w			#(XSTRT+(YSTRT*256)),DIWSTRT(a6)				; DIWSTRT - górny-lewy róg ekranu (2c81)
+		move.w			#((XSTOP-256)+(YSTOP-256)*256),DIWSTOP(a6)			; DIWSTOP - dolny-prawy róg ekranu (c8d1)
+		move.w			#(HSTRT/2-RES),DDFSTRT(a6)					; DDFSTRT
+		move.w			#((HSTRT/2-RES)+(8*((WIDTH/16)-1))),DDFSTOP(a6)			; DDFSTOP
 
 	; ---------------------------------------------------------------------
         ; DMA i IRQ
 	; ---------------------------------------------------------------------
 
-		move.w			#%1000000111000000,DMACON(a6)							; DMA set ON
-		move.w			#%0000000000111111,DMACON(a6)							; DMA set OFF
-		move.w			#%1100000000000000,INTENA(a6)							; IRQ set ON
-		move.w			#%0011111111111111,INTENA(a6)							; IRQ set OFF
+		move.w			#%1000000111000000,DMACON(a6)					; DMA set ON
+		move.w			#%0000000000111111,DMACON(a6)					; DMA set OFF
+		move.w			#%1100000000000000,INTENA(a6)					; IRQ set ON
+		move.w			#%0011111111111111,INTENA(a6)					; IRQ set OFF
 
 	; ---------------------------------------------------------------------
         ; Stworzenie copperlisty
 	; ---------------------------------------------------------------------
 
-	; ilość bitplanów
+	; -- logo ---
 
 		move.w			#$5200,d0
 		move.l			#cl_logo_bitplanes_nr+2,a0
-		move.w			d0,(a0)
-
-		move.w			#$3200,d0
-		move.l			#cl_vector_bitplanes_nr+2,a0
-		move.w			d0,(a0)
-
-		move.w			#$4200,d0
-		move.l			#cl_scroll_bitplanes_nr+2,a0
 		move.w			d0,(a0)
 
 	; logo bitplan 0
@@ -168,38 +162,6 @@ init:
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_logo_address+2+4*09,a0
-		move.w			d0,(a0)
-
-	; scroll bitplan 0
-		move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d0
-		move.l			#cl_scroll_address+2+4*00,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_scroll_address+2+4*01,a0
-		move.w			d0,(a0)
-
-	; scroll bitplan 1
-		move.l			#logo_bitplanes+1*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d0
-		move.l			#cl_scroll_address+2+4*02,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_scroll_address+2+4*03,a0
-		move.w			d0,(a0)
-
-	; scroll bitplan 2
-		move.l			#logo_bitplanes+2*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d0
-		move.l			#cl_scroll_address+2+4*04,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_scroll_address+2+4*05,a0
-		move.w			d0,(a0)
-
-	; scroll bitplan 3
-		move.l			#logo_bitplanes+3*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d0
-		move.l			#cl_scroll_address+2+4*06,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_scroll_address+2+4*07,a0
 		move.w			d0,(a0)
 
 	; kolory logo
@@ -332,6 +294,36 @@ init:
 		move.l			#cl_logo_colors+2+4*31,a0
 		move.w			d0,(a0)
 
+	; -----------------------------------------------------------------------------
+	; --- vector + scroll ---
+	; -----------------------------------------------------------------------------
+
+		move.w			#$6200+DBLPF,d0
+		move.l			#cl_vector_bitplanes_nr+2,a0
+		move.w			d0,(a0)
+
+	; bitplan 4
+		move.l			#buf+4*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
+		move.l			#cl_vector_address+2+4*06,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_vector_address+2+4*07,a0
+		move.w			d0,(a0)
+	; bitplan 5
+		move.l			#buf+5*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
+		move.l			#cl_vector_address+2+4*08,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_vector_address+2+4*09,a0
+		move.w			d0,(a0)
+	; bitplan 6
+		move.l			#buf+6*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
+		move.l			#cl_vector_address+2+4*10,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_vector_address+2+4*11,a0
+		move.w			d0,(a0)
+
 	; kolory vector
 	
 		move.w			vector_colors+2*00,d0
@@ -368,90 +360,54 @@ init:
 
 	; kolory scroll
 	
-		move.w			scroll_colors+2*00,d0
-		move.l			#cl_scroll_colors+2+4*00,a0
+		move.w			vector_colors+2*08,d0
+		move.l			#cl_vector_colors+2+4*08,a0
 		move.w			d0,(a0)
 
-		move.w			scroll_colors+2*01,d0
-		move.l			#cl_scroll_colors+2+4*01,a0
+		move.w			vector_colors+2*09,d0
+		move.l			#cl_vector_colors+2+4*09,a0
 		move.w			d0,(a0)
 
-		move.w			scroll_colors+2*02,d0
-		move.l			#cl_scroll_colors+2+4*02,a0
+		move.w			vector_colors+2*10,d0
+		move.l			#cl_vector_colors+2+4*10,a0
 		move.w			d0,(a0)
 
-		move.w			scroll_colors+2*03,d0
-		move.l			#cl_scroll_colors+2+4*03,a0
+		move.w			vector_colors+2*11,d0
+		move.l			#cl_vector_colors+2+4*11,a0
 		move.w			d0,(a0)
 
-		move.w			scroll_colors+2*04,d0
-		move.l			#cl_scroll_colors+2+4*04,a0
+		move.w			vector_colors+2*12,d0
+		move.l			#cl_vector_colors+2+4*12,a0
 		move.w			d0,(a0)
 
-		move.w			scroll_colors+2*05,d0
-		move.l			#cl_scroll_colors+2+4*05,a0
+		move.w			vector_colors+2*13,d0
+		move.l			#cl_vector_colors+2+4*13,a0
 		move.w			d0,(a0)
 
-		move.w			scroll_colors+2*06,d0
-		move.l			#cl_scroll_colors+2+4*06,a0
+		move.w			vector_colors+2*14,d0
+		move.l			#cl_vector_colors+2+4*14,a0
 		move.w			d0,(a0)
 
-		move.w			scroll_colors+2*07,d0
-		move.l			#cl_scroll_colors+2+4*07,a0
-		move.w			d0,(a0)
-
-		move.w			scroll_colors+2*08,d0
-		move.l			#cl_scroll_colors+2+4*08,a0
-		move.w			d0,(a0)
-
-		move.w			scroll_colors+2*09,d0
-		move.l			#cl_scroll_colors+2+4*09,a0
-		move.w			d0,(a0)
-
-		move.w			scroll_colors+2*10,d0
-		move.l			#cl_scroll_colors+2+4*10,a0
-		move.w			d0,(a0)
-
-		move.w			scroll_colors+2*11,d0
-		move.l			#cl_scroll_colors+2+4*11,a0
-		move.w			d0,(a0)
-
-		move.w			scroll_colors+2*12,d0
-		move.l			#cl_scroll_colors+2+4*12,a0
-		move.w			d0,(a0)
-
-		move.w			scroll_colors+2*13,d0
-		move.l			#cl_scroll_colors+2+4*13,a0
-		move.w			d0,(a0)
-
-		move.w			scroll_colors+2*14,d0
-		move.l			#cl_scroll_colors+2+4*14,a0
-		move.w			d0,(a0)
-
-		move.w			scroll_colors+2*15,d0
-		move.l			#cl_scroll_colors+2+4*15,a0
+		move.w			vector_colors+2*15,d0
+		move.l			#cl_vector_colors+2+4*15,a0
 		move.w			d0,(a0)
 
 	; =====================================================================
 	; main loop
 	; =====================================================================
 
-		; move.l			#fonts+0*WIDTH/8*HEIGHT,d0
-		; move.l			#logo_bitplanes+0*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d1
-		; move.l			#WIDTH/8*RASTER_SCROLL_SIZE,d2
-		; jsr			copy
-		; move.l			#fonts+1*WIDTH/8*HEIGHT,d0
-		; move.l			#logo_bitplanes+1*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d1
-		; move.l			#WIDTH/8*RASTER_SCROLL_SIZE,d2
-		; jsr			copy
-		; move.l			#fonts+2*WIDTH/8*HEIGHT,d0
-		; move.l			#logo_bitplanes+2*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d1
-		; move.l			#WIDTH/8*RASTER_SCROLL_SIZE,d2
-		; jsr			copy
-		; move.l			#fonts+3*WIDTH/8*HEIGHT,d0
-		; move.l			#logo_bitplanes+3*WIDTH/8*HEIGHT+RASTER_SCROLL*WIDTH/8,d1
-		; move.l			#WIDTH/8*RASTER_SCROLL_SIZE,d2
-		; jsr			copy
+		move.l			#fonts+0*WIDTH/8*HEIGHT,d0
+		move.l			#buf+4*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d1
+		move.l			#WIDTH/8*48,d2
+		jsr			copy
+		move.l			#fonts+1*WIDTH/8*HEIGHT,d0
+		move.l			#buf+5*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d1
+		move.l			#WIDTH/8*48,d2
+		jsr			copy
+		move.l			#fonts+2*WIDTH/8*HEIGHT,d0
+		move.l			#buf+6*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d1
+		move.l			#WIDTH/8*48,d2
+		jsr			copy
 
 mainloop:
 
@@ -506,7 +462,7 @@ raster:
 	; ---------------------------------------------------------------------
 
 		jsr			mt_music
-		lea			CUSTOM,a6									; przywracamy CUSTOM
+		lea			CUSTOM,a6							; przywracamy CUSTOM
 
 	; ---------------------------------------------------------------------
 	; FX
@@ -539,11 +495,11 @@ exit:
 		move.l			oldcopper,COP1LCH(a6)
 		move.l			gfxbase,a6
 		move.l			oldview,a1
-		jsr			-222(a6)									; LoadView
-		jsr			-270(a6)									; WaitTOF
-		jsr			-270(a6)									; WaitTOF
+		jsr			-222(a6)							; LoadView
+		jsr			-270(a6)							; WaitTOF
+		jsr			-270(a6)							; WaitTOF
 		move.l			$4,a6
-		jsr			-138(a6)									; Permit
+		jsr			-138(a6)							; Permit
 		rts
 
 ; =============================================================================
@@ -924,9 +880,9 @@ rotate:
 		clr.l			d6
 		move.l			ax,d3
 		asl			#1,d3
-		move.w			(a0,d3),d4									; sin
+		move.w			(a0,d3),d4							; sin
 		move.l			d4,d5
-		move.w			(a1,d3),d6									; cos
+		move.w			(a1,d3),d6							; cos
 		move.l			d6,d7
 	; y
 		muls			d1,d6
@@ -957,9 +913,9 @@ rotate:
 		clr.l			d6
 		move.l			ay,d3
 		asl			#1,d3
-		move.w			(a0,d3),d4									; sin
+		move.w			(a0,d3),d4							; sin
 		move.l			d4,d5
-		move.w			(a1,d3),d6									; cos
+		move.w			(a1,d3),d6							; cos
 		move.l			d6,d7
 	; x
 		muls			d0,d6
@@ -989,9 +945,9 @@ rotate:
 		clr.l			d6
 		move.l			az,d3
 		asl			#1,d3
-		move.w			(a0,d3),d4									; sin
+		move.w			(a0,d3),d4							; sin
 		move.l			d4,d5
-		move.w			(a1,d3),d6									; cos
+		move.w			(a1,d3),d6							; cos
 		move.l			d6,d7
 	; x
 		muls			d0,d6
@@ -1084,97 +1040,97 @@ persp:
 line:
 		movea.l			a2,a0
 
-		sub.w			d0,d2										; obliczamy różnicę x -> dx
-		bmi			xneg										; jeżeli ujemna to oktant 3,4,5,6
+		sub.w			d0,d2								; obliczamy różnicę x -> dx
+		bmi			xneg								; jeżeli ujemna to oktant 3,4,5,6
 
-		sub.w			d1,d3										; obliczamy różnicę y calculate dy, dx jest dodatnie więc oktant 1,2,7,8
-		bmi			yneg										; jeżeli dy ujemne oktant 7,8
-		cmp.w			d3,d2										; porównanie dx i dy - rozróżnienie pomiędzy oktantami 1,2
-		bmi			ygtx										; jeżeli y > x oktant 2
-		moveq.l			#OCTANT1+LINEMODE,d5								; jeżeli nie to otkant 1
+		sub.w			d1,d3								; obliczamy różnicę y calculate dy, dx jest dodatnie więc oktant 1,2,7,8
+		bmi			yneg								; jeżeli dy ujemne oktant 7,8
+		cmp.w			d3,d2								; porównanie dx i dy - rozróżnienie pomiędzy oktantami 1,2
+		bmi			ygtx								; jeżeli y > x oktant 2
+		moveq.l			#OCTANT1+LINEMODE,d5						; jeżeli nie to otkant 1
 		bra			lineagain
 ygtx:
-		exg			d2,d3										; x musi być większe od y - zamiana
-		moveq.l			#OCTANT2+LINEMODE,d5								; wybór oktant 2
+		exg			d2,d3								; x musi być większe od y - zamiana
+		moveq.l			#OCTANT2+LINEMODE,d5						; wybór oktant 2
 		bra			lineagain
 yneg:
-		neg.w			d3										; abs(dy)
-		cmp.w			d3,d2										; sprawdzamy pomedzy 7 i 8
-		bmi			ynygtx										; jeżeli y > x to oktant 7
-		moveq.l			#OCTANT8+LINEMODE,d5								; nie - 8
+		neg.w			d3								; abs(dy)
+		cmp.w			d3,d2								; sprawdzamy pomedzy 7 i 8
+		bmi			ynygtx								; jeżeli y > x to oktant 7
+		moveq.l			#OCTANT8+LINEMODE,d5						; nie - 8
 		bra			lineagain
 ynygtx:
-		exg			d2,d3										; x musi być większe od y - zamiana
-		moveq.l			#OCTANT7+LINEMODE,d5								; wybór oktant 7
+		exg			d2,d3								; x musi być większe od y - zamiana
+		moveq.l			#OCTANT7+LINEMODE,d5						; wybór oktant 7
 		bra			lineagain
 xneg:
-		neg.w			d2										; dx było ujemne więc negujemy, jesteśmy w oktant 3,4,5,6
-		sub.w			d1,d3										; obliczamy dy
-		bmi			xyneg										; jeżeli ujemne oktant 5,6
-		cmp.w			d3,d2										; jeżeli nie to 3,4
-		bmi			xnygtx										; jeżeli y > x, oktant 3
-		moveq.l			#OCTANT4+LINEMODE,d5								; jeżeli nie to 4
+		neg.w			d2								; dx było ujemne więc negujemy, jesteśmy w oktant 3,4,5,6
+		sub.w			d1,d3								; obliczamy dy
+		bmi			xyneg								; jeżeli ujemne oktant 5,6
+		cmp.w			d3,d2								; jeżeli nie to 3,4
+		bmi			xnygtx								; jeżeli y > x, oktant 3
+		moveq.l			#OCTANT4+LINEMODE,d5						; jeżeli nie to 4
 		bra			lineagain
 xnygtx:
-		exg			d2,d3										; x musi być większe od y - zamiana
-		moveq.l			#OCTANT3+LINEMODE,d5								; wybór oktant 3
+		exg			d2,d3								; x musi być większe od y - zamiana
+		moveq.l			#OCTANT3+LINEMODE,d5						; wybór oktant 3
 		bra			lineagain
 xyneg:
-		neg.w			d3										; y było ujemne więc negujemy, jesteśmy w oktant 5,6
-		cmp.w			d3,d2										; jeżeli y > x
-		bmi			xynygtx										; oktant 6
-		moveq.l			#OCTANT5+LINEMODE,d5								; nie - oktant 5
+		neg.w			d3								; y było ujemne więc negujemy, jesteśmy w oktant 5,6
+		cmp.w			d3,d2								; jeżeli y > x
+		bmi			xynygtx								; oktant 6
+		moveq.l			#OCTANT5+LINEMODE,d5						; nie - oktant 5
 		bra			lineagain
 xynygtx:
-		exg			d2,d3										; x musi być większe od y - zamiana
-		moveq.l			#OCTANT6+LINEMODE,d5								; wybór oktant 6
+		exg			d2,d3								; x musi być większe od y - zamiana
+		moveq.l			#OCTANT6+LINEMODE,d5						; wybór oktant 6
 
 lineagain:
 	; obliczamy początek (bajt w którym zaczynamy rysować)
 
-		ror.l			#4,d0										; move upper four bits into hi word
-		add.w			d0,d0										; mnożenie x 2
+		ror.l			#4,d0								; move upper four bits into hi word
+		add.w			d0,d0								; mnożenie x 2
 
-		mulu.w			d4,d1										; Obliczamy y1 * WIDTH
-		add.l			d1,a0										; ptr += (x1 >> 3)
-		add.w			d0,a0										; ptr += y1 * width
+		mulu.w			d4,d1								; Obliczamy y1 * WIDTH
+		add.l			d1,a0								; ptr += (x1 >> 3)
+		add.w			d0,a0								; ptr += y1 * width
 
-		swap			d0										; get the four bits of x1
-		or.w			#$BFA,d0									; or with USEA, USEC, USED, F=A+C
+		swap			d0								; get the four bits of x1
+		or.w			#$BFA,d0							; or with USEA, USEC, USED, F=A+C
 
-		lsl.w			#2,d3										; Y = 4 * Y
-		add.w			d2,d2										; X = 2 * X
-		move.w			d2,d1										; set up size word
-		lsl.w			#5,d1										; shift five left
-		add.w			#$42,d1										; and add 1 to height, 2 to width
+		lsl.w			#2,d3								; Y = 4 * Y
+		add.w			d2,d2								; X = 2 * X
+		move.w			d2,d1								; set up size word
+		lsl.w			#5,d1								; shift five left
+		add.w			#$42,d1								; and add 1 to height, 2 to width
 		
 		M_BLITTER_WAIT
 		
-		move.w			d3,BLTBMOD(a6)									; B mod = 4 * Y
+		move.w			d3,BLTBMOD(a6)							; B mod = 4 * Y
 		sub.w			d2,d3
 		ext.l			d3
-		move.l			d3,BLTAPT(a6)									; A ptr = 4 * Y - 2 * X
+		move.l			d3,BLTAPT(a6)							; A ptr = 4 * Y - 2 * X
 
 
 
-		bpl			lineover									; if negative,
-		or.w			#SIGNFLAG,d5									; set sign bit in con1
+		bpl			lineover							; if negative,
+		or.w			#SIGNFLAG,d5							; set sign bit in con1
 lineover:
 		; or.w			#2,d5										; SING bit for filling
 		
-		move.w			d0,BLTCON0(a6)									; write control registers
+		move.w			d0,BLTCON0(a6)							; write control registers
 		move.w			d5,BLTCON1(a6)
-		move.w			d4,BLTCMOD(a6)									; C mod = bitplane width
-		move.w			d4,BLTDMOD(a6)									; D mod = bitplane width
+		move.w			d4,BLTCMOD(a6)							; C mod = bitplane width
+		move.w			d4,BLTDMOD(a6)							; D mod = bitplane width
 		sub.w			d2,d3
-		move.w			d3,BLTAMOD(a6)									; A mod = 4 * Y - 4 * X
-		move.w			#$8000,BLTADAT(a6)								; A data = 0x8000
-		moveq.l			#-1,d5										; Set masks to all ones
-		move.l			d5,BLTAFWM(a6)									; we can hit both masks at once
-		move.l			a0,BLTCPT(a6)									; Pointer to first pixel to set
+		move.w			d3,BLTAMOD(a6)							; A mod = 4 * Y - 4 * X
+		move.w			#$8000,BLTADAT(a6)						; A data = 0x8000
+		moveq.l			#-1,d5								; Set masks to all ones
+		move.l			d5,BLTAFWM(a6)							; we can hit both masks at once
+		move.l			a0,BLTCPT(a6)							; Pointer to first pixel to set
 		move.l			a0,BLTDPT(a6)
-		move.w			d1,BLTSIZE(a6)									; Start blit
-		rts													; and return, blit still in progress.
+		move.w			d1,BLTSIZE(a6)							; Start blit
+		rts											; and return, blit still in progress.
         
 ; =============================================================================
 ; Copy and fill
@@ -1231,11 +1187,11 @@ copy:
 clear:
 		M_BLITTER_WAIT
 
-		clr.w			BLTDMOD(a6)									;destination modulo
-		move.l			#$01000000,BLTCON0(a6)								;set operation type in BLTCON0/1
+		clr.w			BLTDMOD(a6)							;destination modulo
+		move.l			#$01000000,BLTCON0(a6)						;set operation type in BLTCON0/1
 		lsr.l			d1
-		move.l			a2,BLTDPTH(a6)									;destination address
-		move.w			d1,BLTSIZE(a6)									;blitter operation size
+		move.l			a2,BLTDPTH(a6)							;destination address
+		move.w			d1,BLTSIZE(a6)							;blitter operation size
 
 		rts
 
@@ -1243,6 +1199,9 @@ clear:
 ; DANE
 ; =============================================================================
 
+		CNOP			0,4
+		; duże tablice
+		include			"sincos.i"
 
 		CNOP			0,4
 AdrMulTab
@@ -1297,122 +1256,36 @@ ax:		dc.l			0
 ay:		dc.l			0
 az:		dc.l			0
 
-sinus:	
-		dc.w			0,2,4,6,8,10,11,13,15,17,19,21,23,24,26,28
-		dc.w			30,32,34,35,37,39,41,43,44,46,48,50,52,54,55,57
-		dc.w			59,61,63,64,66,68,70,72,73,75,77,79,80,82,84,86
-		dc.w			88,89,91,93,95,96,98,100,102,103,105,107,108,110,112,114
-		dc.w			115,117,119,120,122,124,125,127,129,130,132,134,135,137,139,140
-		dc.w			142,143,145,147,148,150,151,153,155,156,158,159,161,162,164,166
-		dc.w			167,169,170,172,173,175,176,178,179,181,182,183,185,186,188,189
-		dc.w			191,192,194,195,196,198,199,200,202,203,205,206,207,209,210,211
-		dc.w			212,214,215,216,218,219,220,221,223,224,225,226,227,229,230,231
-		dc.w			232,233,234,236,237,238,239,240,241,242,243,244,245,247,248,249
-		dc.w			250,251,252,253,254,255,256,256,257,258,259,260,261,262,263,264
-		dc.w			265,266,266,267,268,269,270,270,271,272,273,274,274,275,276,276
-		dc.w			277,278,279,279,280,281,281,282,282,283,284,284,285,285,286,286
-		dc.w			287,287,288,288,289,289,290,290,291,291,292,292,292,293,293,294
-		dc.w			294,294,295,295,295,296,296,296,296,297,297,297,297,298,298,298
-		dc.w			298,298,299,299,299,299,299,299,299,299,299,299,299,299,299,299
-cosinus:
-		dc.w			299,299,299,299,299,299,299,299,299,299,299,299,299,298,298,298
-		dc.w			298,298,298,297,297,297,297,296,296,296,295,295,295,295,294,294
-		dc.w			293,293,293,292,292,291,291,291,290,290,289,289,288,288,287,287
-		dc.w			286,286,285,284,284,283,283,282,281,281,280,280,279,278,277,277
-		dc.w			276,275,275,274,273,272,272,271,270,269,268,268,267,266,265,264
-		dc.w			263,262,262,261,260,259,258,257,256,255,254,253,252,251,250,249
-		dc.w			248,247,246,245,244,243,242,241,240,238,237,236,235,234,233,232
-		dc.w			230,229,228,227,226,224,223,222,221,219,218,217,216,214,213,212
-		dc.w			210,209,208,207,205,204,202,201,200,198,197,196,194,193,191,190
-		dc.w			189,187,186,184,183,181,180,178,177,175,174,172,171,169,168,166
-		dc.w			165,163,162,160,159,157,155,154,152,151,149,148,146,144,143,141
-		dc.w			139,138,136,135,133,131,130,128,126,125,123,121,119,118,116,114
-		dc.w			113,111,109,108,106,104,102,101,99,97,95,94,92,90,88,87
-		dc.w			85,83,81,80,78,76,74,72,71,69,67,65,63,62,60,58
-		dc.w			56,54,53,51,49,47,45,44,42,40,38,36,34,33,31,29
-		dc.w			27,25,23,22,20,18,16,14,12,11,9,7,5,3,1,0
-		dc.w			0,-1,-3,-5,-7,-9,-11,-12,-14,-16,-18,-20,-22,-23,-25,-27
-		dc.w			-29,-31,-33,-34,-36,-38,-40,-42,-44,-45,-47,-49,-51,-53,-54,-56
-		dc.w			-58,-60,-62,-63,-65,-67,-69,-71,-72,-74,-76,-78,-80,-81,-83,-85
-		dc.w			-87,-88,-90,-92,-94,-95,-97,-99,-101,-102,-104,-106,-108,-109,-111,-113
-		dc.w			-114,-116,-118,-119,-121,-123,-125,-126,-128,-130,-131,-133,-135,-136,-138,-139
-		dc.w			-141,-143,-144,-146,-148,-149,-151,-152,-154,-155,-157,-159,-160,-162,-163,-165
-		dc.w			-166,-168,-169,-171,-172,-174,-175,-177,-178,-180,-181,-183,-184,-186,-187,-189
-		dc.w			-190,-191,-193,-194,-196,-197,-198,-200,-201,-202,-204,-205,-207,-208,-209,-210
-		dc.w			-212,-213,-214,-216,-217,-218,-219,-221,-222,-223,-224,-226,-227,-228,-229,-230
-		dc.w			-232,-233,-234,-235,-236,-237,-238,-240,-241,-242,-243,-244,-245,-246,-247,-248
-		dc.w			-249,-250,-251,-252,-253,-254,-255,-256,-257,-258,-259,-260,-261,-262,-262,-263
-		dc.w			-264,-265,-266,-267,-268,-268,-269,-270,-271,-272,-272,-273,-274,-275,-275,-276
-		dc.w			-277,-277,-278,-279,-280,-280,-281,-281,-282,-283,-283,-284,-284,-285,-286,-286
-		dc.w			-287,-287,-288,-288,-289,-289,-290,-290,-291,-291,-291,-292,-292,-293,-293,-293
-		dc.w			-294,-294,-295,-295,-295,-295,-296,-296,-296,-297,-297,-297,-297,-298,-298,-298
-		dc.w			-298,-298,-298,-299,-299,-299,-299,-299,-299,-299,-299,-299,-299,-299,-299,-299
-		dc.w			-299,-299,-299,-299,-299,-299,-299,-299,-299,-299,-299,-299,-299,-299,-298,-298
-		dc.w			-298,-298,-298,-297,-297,-297,-297,-296,-296,-296,-296,-295,-295,-295,-294,-294
-		dc.w			-294,-293,-293,-292,-292,-292,-291,-291,-290,-290,-289,-289,-288,-288,-287,-287
-		dc.w			-286,-286,-285,-285,-284,-284,-283,-282,-282,-281,-281,-280,-279,-279,-278,-277
-		dc.w			-276,-276,-275,-274,-274,-273,-272,-271,-270,-270,-269,-268,-267,-266,-266,-265
-		dc.w			-264,-263,-262,-261,-260,-259,-258,-257,-256,-256,-255,-254,-253,-252,-251,-250
-		dc.w			-249,-248,-247,-245,-244,-243,-242,-241,-240,-239,-238,-237,-236,-234,-233,-232
-		dc.w			-231,-230,-229,-227,-226,-225,-224,-223,-221,-220,-219,-218,-216,-215,-214,-212
-		dc.w			-211,-210,-209,-207,-206,-205,-203,-202,-200,-199,-198,-196,-195,-194,-192,-191
-		dc.w			-189,-188,-186,-185,-183,-182,-181,-179,-178,-176,-175,-173,-172,-170,-169,-167
-		dc.w			-166,-164,-162,-161,-159,-158,-156,-155,-153,-151,-150,-148,-147,-145,-143,-142
-		dc.w			-140,-139,-137,-135,-134,-132,-130,-129,-127,-125,-124,-122,-120,-119,-117,-115
-		dc.w			-114,-112,-110,-108,-107,-105,-103,-102,-100,-98,-96,-95,-93,-91,-89,-88
-		dc.w			-86,-84,-82,-80,-79,-77,-75,-73,-72,-70,-68,-66,-64,-63,-61,-59
-		dc.w			-57,-55,-54,-52,-50,-48,-46,-44,-43,-41,-39,-37,-35,-34,-32,-30
-		dc.w			-28,-26,-24,-23,-21,-19,-17,-15,-13,-11,-10,-8,-6,-4,-2,0
-		dc.w			0,2,4,6,8,10,11,13,15,17,19,21,23,24,26,28
-		dc.w			30,32,34,35,37,39,41,43,44,46,48,50,52,54,55,57
-		dc.w			59,61,63,64,66,68,70,72,73,75,77,79,80,82,84,86
-		dc.w			88,89,91,93,95,96,98,100,102,103,105,107,108,110,112,114
-		dc.w			115,117,119,120,122,124,125,127,129,130,132,134,135,137,139,140
-		dc.w			142,143,145,147,148,150,151,153,155,156,158,159,161,162,164,166
-		dc.w			167,169,170,172,173,175,176,178,179,181,182,183,185,186,188,189
-		dc.w			191,192,194,195,196,198,199,200,202,203,205,206,207,209,210,211
-		dc.w			212,214,215,216,218,219,220,221,223,224,225,226,227,229,230,231
-		dc.w			232,233,234,236,237,238,239,240,241,242,243,244,245,247,248,249
-		dc.w			250,251,252,253,254,255,256,256,257,258,259,260,261,262,263,264
-		dc.w			265,266,266,267,268,269,270,270,271,272,273,274,274,275,276,276
-		dc.w			277,278,279,279,280,281,281,282,282,283,284,284,285,285,286,286
-		dc.w			287,287,288,288,289,289,290,290,291,291,292,292,292,293,293,294
-		dc.w			294,294,295,295,295,296,296,296,296,297,297,297,297,298,298,298
-		dc.w			298,298,299,299,299,299,299,299,299,299,299,299,299,299,299,299
+		CNOP			0,4
 
-zoomx_tab:
-		dc.w			0,1,3,5,7,9,11,12,14,16,18,20,22,23,25,27
-		dc.w			29,31,32,34,36,38,40,41,43,45,47,48,50,52,54,55
-		dc.w			57,59,60,62,64,65,67,69,70,72,74,75,77,78,80,81
-		dc.w			83,85,86,88,89,90,92,93,95,96,98,99,100,102,103,104
-		dc.w			106,107,108,110,111,112,113,114,116,117,118,119,120,121,122,123
-		dc.w			124,125,126,127,128,129,130,131,132,133,134,134,135,136,137,138
-		dc.w			138,139,140,140,141,141,142,143,143,144,144,145,145,146,146,146
-		dc.w			147,147,147,148,148,148,148,149,149,149,149,149,149,149,149,149
-		dc.w			149,149,149,149,149,149,149,149,149,149,148,148,148,148,147,147
-		dc.w			147,146,146,145,145,144,144,143,143,142,142,141,141,140,139,139
-		dc.w			138,137,136,136,135,134,133,132,132,131,130,129,128,127,126,125
-		dc.w			124,123,122,121,120,118,117,116,115,114,113,111,110,109,108,106
-		dc.w			105,104,102,101,100,98,97,96,94,93,91,90,88,87,85,84
-		dc.w			82,81,79,78,76,74,73,71,70,68,66,65,63,61,60,58
-		dc.w			56,54,53,51,49,48,46,44,42,40,39,37,35,33,32,30
-		dc.w			28,26,24,22,21,19,17,15,13,11,10,8,6,4,2,0
-		dc.w			0,-2,-4,-6,-8,-10,-11,-13,-15,-17,-19,-21,-22,-24,-26,-28
-		dc.w			-30,-32,-33,-35,-37,-39,-40,-42,-44,-46,-48,-49,-51,-53,-54,-56
-		dc.w			-58,-60,-61,-63,-65,-66,-68,-70,-71,-73,-74,-76,-78,-79,-81,-82
-		dc.w			-84,-85,-87,-88,-90,-91,-93,-94,-96,-97,-98,-100,-101,-102,-104,-105
-		dc.w			-106,-108,-109,-110,-111,-113,-114,-115,-116,-117,-118,-120,-121,-122,-123,-124
-		dc.w			-125,-126,-127,-128,-129,-130,-131,-132,-132,-133,-134,-135,-136,-136,-137,-138
-		dc.w			-139,-139,-140,-141,-141,-142,-142,-143,-143,-144,-144,-145,-145,-146,-146,-147
-		dc.w			-147,-147,-148,-148,-148,-148,-149,-149,-149,-149,-149,-149,-149,-149,-149,-149
-		dc.w			-149,-149,-149,-149,-149,-149,-149,-149,-149,-148,-148,-148,-148,-147,-147,-147
-		dc.w			-146,-146,-146,-145,-145,-144,-144,-143,-143,-142,-141,-141,-140,-140,-139,-138
-		dc.w			-138,-137,-136,-135,-134,-134,-133,-132,-131,-130,-129,-128,-127,-126,-125,-124
-		dc.w			-123,-122,-121,-120,-119,-118,-117,-116,-114,-113,-112,-111,-110,-108,-107,-106
-		dc.w			-104,-103,-102,-100,-99,-98,-96,-95,-93,-92,-90,-89,-88,-86,-85,-83
-		dc.w			-81,-80,-78,-77,-75,-74,-72,-70,-69,-67,-65,-64,-62,-60,-59,-57
-		dc.w			-55,-54,-52,-50,-48,-47,-45,-43,-41,-40,-38,-36,-34,-32,-31,-29
-		dc.w			-27,-25,-23,-22,-20,-18,-16,-14,-12,-11,-9,-7,-5,-3,-1,0
+buf_index_max		EQU	16
+
+buf_index:	dc.l			0
+
+buf_tab:
+		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+
+buf_tab_bitplane0:
+		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+
+buf_tab_bitplane1:
+		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+
+buf_tab_bitplane2:
+		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+
 
 ; -----------------------------------------------------------------------------
 ; zmienne standardowe
@@ -1454,15 +1327,16 @@ gfxname:
 
 		CNOP			0,4
 fonts:	
-		incbin			"gfx/fonts16_16col.raw"
+		incbin			"gfx/fonts16_8col.raw"
 
 		CNOP			0,4
-logo_bitplanes:	
+logo_bitplanes:
 		incbin			"gfx/SAMAR_logo_32col.raw"
 
 		CNOP			0,4
 buf:
-		blk.b			5*WIDTH/8*HEIGHT,0
+		blk.b			7*WIDTH/8*HEIGHT,0						; bitplanes + bufor na rysowanie (nr 3) - od 4 zaczyna się skroll
+		blk.b			WIDTH/8*RASTER_VECTORS,0					; bufor żeby nie nachodziło na dalsze regiony
 
 		CNOP			0,4
 logo_colors:	
@@ -1470,13 +1344,8 @@ logo_colors:
 
 		CNOP			0,4
 vector_colors:
-		; dc.w			$0223,$0fff,$0ccc,$0ccc,$0aaa,$0aaa,$0aaa,$0aaa
-		dc.w			$0223,$0622,$0744,$0866,$0988,$0aaa,$0ccc,$0eee
-
-		CNOP			0,4
-scroll_colors:
-		incbin			"gfx/fonts16_16col.pal"
-		; dc.w			$0fff,$0fff,$0fff,$0fff,$0fff,$0fff,$0fff,$0fff
+		dc.w			BACKGROUND_COLOR,$0511,$0633,$0755,$0877,$0999,$0bbb,$0ddd
+		incbin			"gfx/fonts16_8col.pal"
 
 ; -----------------------------------------------------------------------------
 ; copperlista
@@ -1534,9 +1403,8 @@ cl_logo_colors:
 cl_logo_bitplanes_nr:
 		dc.w			BPLCON0,0
 
-		; vector
-
-		dc.w			RASTER_VECTORS_CL,$ff00								; czekam na raster
+		; --- vector ---
+		dc.w			RASTER_VECTORS_CL,$ff00						; czekam na raster
 
 cl_vector_address:
 		dc.w			BPL1PTL,0
@@ -1545,37 +1413,14 @@ cl_vector_address:
 		dc.w			BPL2PTH,0
 		dc.w			BPL3PTL,0
 		dc.w			BPL3PTH,0
-
-cl_vector_colors:
-		dc.w			COLOR00,0
-		dc.w			COLOR01,0
-		dc.w			COLOR02,0
-		dc.w			COLOR03,0
-		dc.w			COLOR04,0
-		dc.w			COLOR05,0
-		dc.w			COLOR06,0
-		dc.w			COLOR07,0
-
-cl_vector_bitplanes_nr:
-		dc.w			BPLCON0,0
-
-		dc.l			$fffffffe									; tymczasowo
-
-		; scroll
-
-		dc.w			RASTER_SCROLL_CL,$ff00								; czekam na raster
-
-cl_scroll_address:
-		dc.w			BPL1PTL,0
-		dc.w			BPL1PTH,0
-		dc.w			BPL2PTL,0
-		dc.w			BPL2PTH,0
-		dc.w			BPL3PTL,0
-		dc.w			BPL3PTH,0
 		dc.w			BPL4PTL,0
 		dc.w			BPL4PTH,0
+		dc.w			BPL5PTL,0
+		dc.w			BPL5PTH,0
+		dc.w			BPL6PTL,0
+		dc.w			BPL6PTH,0
 
-cl_scroll_colors:
+cl_vector_colors:
 		dc.w			COLOR00,0
 		dc.w			COLOR01,0
 		dc.w			COLOR02,0
@@ -1593,40 +1438,10 @@ cl_scroll_colors:
 		dc.w			COLOR14,0
 		dc.w			COLOR15,0
 
-cl_scroll_bitplanes_nr:
+cl_vector_bitplanes_nr:
 		dc.w			BPLCON0,0
 
-		dc.l			$fffffffe
-
-		CNOP			0,4
-
-buf_index_max		EQU	16
-
-buf_index:	dc.l			0
-
-buf_tab:
-		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-
-buf_tab_bitplane0:
-		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-
-buf_tab_bitplane1:
-		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-
-buf_tab_bitplane2:
-		dc.l			buf+3*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+0*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+1*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
-		dc.l			buf+2*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8
+		dc.l			$fffffffe							; tymczasowo
 
 ; =============================================================================
 ; MUZA
