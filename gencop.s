@@ -1328,7 +1328,7 @@ gfxname:
 
 		CNOP			0,4
 fonts:	
-		incbin			"gfx/fonty.raw"
+		incbin			"gfx/fonty_dark.raw"
 
 		CNOP			0,4
 logo_bitplanes:
@@ -1348,7 +1348,7 @@ buf4:
 		blk.b			WIDTH/8*HEIGHT,0
 
 fonty_bitplanes:
-		incbin			"gfx/fonty.raw"
+		incbin			"gfx/fonty_dark.raw"
 
 	; bufor żeby nie nachodziło na dalsze regiony
 empty_buf2:
@@ -1361,7 +1361,7 @@ logo_colors:
 		CNOP			0,4
 vector_colors:
 		dc.w			BACKGROUND_COLOR,$0511,$0633,$0755,$0877,$0999,$0bbb,$0ddd
-		incbin			"gfx/fonty.pal"
+		incbin			"gfx/fonty_dark.pal"
 
 ; -----------------------------------------------------------------------------
 ; copperlista
@@ -1369,6 +1369,10 @@ vector_colors:
 
 		CNOP			0,4
 cl:
+
+cl_logo_bitplanes_nr:
+		dc.w			BPLCON0,0
+		; dc.w			BPLCON1,0
 
 cl_logo_address:
 		dc.w			BPL1PTL,0
@@ -1418,9 +1422,6 @@ cl_logo_colors:
 		dc.w			COLOR30,0
 		dc.w			COLOR31,0
 
-cl_logo_bitplanes_nr:
-		dc.w			BPLCON0,0
-
 		; --- vector ---
 		dc.w			RASTER_VECTORS_CL-2,$ff00					; czekam na raster
 
@@ -1446,6 +1447,8 @@ cl_vector_colors:
 
 cl_vector_bitplanes_nr:
 		dc.w			BPLCON0,0
+; cl_scroll:
+; 		dc.w			BPLCON1,$00f0
 
 cl_vector_address:
 		dc.w			BPL1PTL,0
