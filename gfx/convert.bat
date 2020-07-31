@@ -9,3 +9,9 @@ amigeconv.exe -f palette -c 16 -p loadrgb4 fonts16_16col.png fonts16_16col.pal
 
 amigeconv.exe -f bitplane -d 3 fonts16_8col.png fonts16_8col.raw
 amigeconv.exe -f palette -c 8 -p loadrgb4 fonts16_8col.png fonts16_8col.pal
+
+amigeconv.exe -f bitplane -d 3 fonts16_8col-ekran.png fonts16_8col-ekran.raw
+amigeconv.exe -f palette -c 8 -p loadrgb4 fonts16_8col-ekran.png fonts16_8col-ekran.pal
+
+amigeconv.exe -f bitplane -d 3 fonty.png fonty.raw
+amigeconv.exe -f palette -c 8 -p loadrgb4 fonty.png fonty.pal

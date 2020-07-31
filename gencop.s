@@ -302,21 +302,21 @@ init:
 		move.l			#cl_vector_bitplanes_nr+2,a0
 		move.w			d0,(a0)
 
-	; bitplan 4
+	; bitplan 3
 		move.l			#buf+4*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
+		move.l			#cl_vector_address+2+4*02,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_vector_address+2+4*03,a0
+		move.w			d0,(a0)
+	; bitplan 4
+		move.l			#buf+5*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
 		move.l			#cl_vector_address+2+4*06,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*07,a0
 		move.w			d0,(a0)
 	; bitplan 5
-		move.l			#buf+5*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
-		move.l			#cl_vector_address+2+4*08,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*09,a0
-		move.w			d0,(a0)
-	; bitplan 6
 		move.l			#buf+6*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d0
 		move.l			#cl_vector_address+2+4*10,a0
 		move.w			d0,(a0)
@@ -396,17 +396,19 @@ init:
 	; main loop
 	; =====================================================================
 
-		move.l			#fonts+0*WIDTH/8*HEIGHT,d0
-		move.l			#buf+4*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d1
-		move.l			#WIDTH/8*48,d2
-		jsr			copy
-		move.l			#fonts+1*WIDTH/8*HEIGHT,d0
-		move.l			#buf+5*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d1
-		move.l			#WIDTH/8*48,d2
-		jsr			copy
+		; move.l			#fonts+0*WIDTH/8*HEIGHT,d0
+		; move.l			#buf+4*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d1
+		; move.l			#WIDTH/8*HEIGHT,d2
+		; jsr			copy
+
+		; move.l			#fonts+1*WIDTH/8*HEIGHT,d0
+		; move.l			#buf+5*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d1
+		; move.l			#WIDTH/8*HEIGHT,d2
+		; jsr			copy
+
 		move.l			#fonts+2*WIDTH/8*HEIGHT,d0
 		move.l			#buf+6*WIDTH/8*HEIGHT+RASTER_VECTORS*WIDTH/8,d1
-		move.l			#WIDTH/8*48,d2
+		move.l			#WIDTH/8*HEIGHT,d2
 		jsr			copy
 
 mainloop:
@@ -437,18 +439,18 @@ raster:
 	; bitplan 1
 		move.l			#buf_tab_bitplane1,a0
 		move.l			(a0,d1),d0
-		move.l			#cl_vector_address+2+4*02,a0
-		move.w			d0,(a0)
-		swap			d0
-		move.l			#cl_vector_address+2+4*03,a0
-		move.w			d0,(a0)
-	; bitplan 2
-		move.l			#buf_tab_bitplane2,a0
-		move.l			(a0,d1),d0
 		move.l			#cl_vector_address+2+4*04,a0
 		move.w			d0,(a0)
 		swap			d0
 		move.l			#cl_vector_address+2+4*05,a0
+		move.w			d0,(a0)
+	; bitplan 2
+		move.l			#buf_tab_bitplane2,a0
+		move.l			(a0,d1),d0
+		move.l			#cl_vector_address+2+4*08,a0
+		move.w			d0,(a0)
+		swap			d0
+		move.l			#cl_vector_address+2+4*09,a0
 		move.w			d0,(a0)
 
 	; ---------------------------------------------------------------------
@@ -1327,7 +1329,7 @@ gfxname:
 
 		CNOP			0,4
 fonts:	
-		incbin			"gfx/fonts16_8col.raw"
+		incbin			"gfx/fonty.raw"
 
 		CNOP			0,4
 logo_bitplanes:
@@ -1335,8 +1337,26 @@ logo_bitplanes:
 
 		CNOP			0,4
 buf:
-		blk.b			7*WIDTH/8*HEIGHT,0						; bitplanes + bufor na rysowanie (nr 3) - od 4 zaczyna się skroll
-		blk.b			WIDTH/8*RASTER_VECTORS,0					; bufor żeby nie nachodziło na dalsze regiony
+		blk.b			WIDTH/8*HEIGHT,0
+buf2:
+		blk.b			WIDTH/8*HEIGHT,0
+buf3:
+		blk.b			WIDTH/8*HEIGHT,0
+buf4:
+		blk.b			WIDTH/8*HEIGHT,0
+
+		; blk.b			WIDTH/8*RASTER_VECTORS,0
+
+		; incbin			"gfx/fonty.raw"
+buf5:
+		blk.b			WIDTH/8*HEIGHT,0
+buf6:
+		blk.b			WIDTH/8*HEIGHT,0
+buf7:
+		blk.b			WIDTH/8*HEIGHT,0
+
+	; bufor żeby nie nachodziło na dalsze regiony
+		blk.b			WIDTH/8*RASTER_VECTORS,0
 
 		CNOP			0,4
 logo_colors:	
@@ -1345,7 +1365,7 @@ logo_colors:
 		CNOP			0,4
 vector_colors:
 		dc.w			BACKGROUND_COLOR,$0511,$0633,$0755,$0877,$0999,$0bbb,$0ddd
-		incbin			"gfx/fonts16_8col.pal"
+		incbin			"gfx/fonty.pal"
 
 ; -----------------------------------------------------------------------------
 ; copperlista
