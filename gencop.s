@@ -468,15 +468,6 @@ raster:
 			move.w			d0,(a0)
 
 	; ---------------------------------------------------------------------
-	; scroll
-	; ---------------------------------------------------------------------
-
-			move.l			dycp_scroll,d0
-			lsl.l			#4,d0
-			move.l			#cl_scroll+2,a0
-			move.w			d0,(a0)
-			
-	; ---------------------------------------------------------------------
 	; uruchomienie copperlisty
 	; ---------------------------------------------------------------------
 
@@ -1233,10 +1224,6 @@ clear:
 
 dycp:
 
-			sub.l			#1,dycp_scroll
-			bpl			dy1
-			move.l			#15,dycp_scroll
-dy1:
 			; --- czyszczenie starego ---
 
 			move.l			#txt_spaces,a3
@@ -1247,6 +1234,7 @@ dy1:
 			add.l			d4,a4
 
 			move.l			#fonty_bitplanes,a1
+			add.l			dycp_half,a1
 
 dycp_lp1:		clr.l			d0
 			move.b			(a3,d3),d0
@@ -1261,8 +1249,40 @@ dycp_lp1:		clr.l			d0
 			cmp.l			#10,d3
 			bne			dycp_lp1
 
+			; --- ruch ---
+
 			addi.l			#1,dycp_sin_index
 			andi.l			#$ff,dycp_sin_index
+
+			sub.l			#1,dycp_scroll
+			bpl			dy1
+			move.l			#15,dycp_scroll
+			eor.l			#2,dycp_half
+			beq			dycp_no_new_char
+
+			move.b			txt_temp+1,d0
+			move.b			d0,txt_temp+0
+			move.b			txt_temp+2,d0
+			move.b			d0,txt_temp+1
+			move.b			txt_temp+3,d0
+			move.b			d0,txt_temp+2
+			move.b			txt_temp+4,d0
+			move.b			d0,txt_temp+3
+			move.b			txt_temp+5,d0
+			move.b			d0,txt_temp+4
+			move.b			txt_temp+6,d0
+			move.b			d0,txt_temp+5
+			move.b			txt_temp+7,d0
+			move.b			d0,txt_temp+6
+			move.b			txt_temp+8,d0
+			move.b			d0,txt_temp+7
+			move.b			txt_temp+9,d0
+			move.b			d0,txt_temp+8
+
+
+dycp_no_new_char:
+
+dy1:
 
 			; --- drukowanie nowego ---
 
@@ -1274,6 +1294,7 @@ dycp_lp1:		clr.l			d0
 			add.l			d4,a4
 
 			move.l			#fonty_bitplanes,a1
+			add.l			dycp_half,a1
 
 dycp_lp2:		clr.l			d0
 			move.b			(a3,d3),d0
@@ -1288,10 +1309,21 @@ dycp_lp2:		clr.l			d0
 			cmp.l			#10,d3
 			bne			dycp_lp2
 
+
+	; ---------------------------------------------------------------------
+	; scroll
+	; ---------------------------------------------------------------------
+
+			move.l			dycp_scroll,d0
+			lsl.l			#4,d0
+			move.l			#cl_scroll+2,a0
+			move.w			d0,(a0)
+
 			rts
 
 dycp_sin_index:		dc.l			0
 dycp_scroll:		dc.l			0
+dycp_half:		dc.l			2
 
 ; =============================================================================
 ; Copy shifted char to btpl
