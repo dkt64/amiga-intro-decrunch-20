@@ -41,23 +41,6 @@ PLOTS_NR		equ	14
 
 BACKGROUND_COLOR	equ	$0223
 
-; DEBUG_COLORS		EQU	1
-
-d1
-d2
-d3
-d4
-d5
-d6
-d7
-a0
-a1
-a2
-a3
-a4
-a5
-a6
-
 ; =============================================================================
 ; Start programu
 ; =============================================================================
@@ -135,6 +118,15 @@ init:
 	; ---------------------------------------------------------------------
         ; Stworzenie copperlisty
 	; ---------------------------------------------------------------------
+
+	; -- sprite ---
+
+			; move.l			#sprite_data,d0
+			; move.l			#cl_sprite+2+4*00,a0
+			; move.w			d0,(a0)
+			; swap			d0
+			; move.l			#cl_sprite+2+4*01,a0
+			; move.w			d0,(a0)
 
 	; -- logo ---
 
@@ -524,6 +516,20 @@ exit:
 
 my_fx:
 
+		; czyszczenie
+
+			move.l			buf_index,d0
+			move.l			#buf_tab,a0
+			move.l			(a0,d0),a2
+			move.l			#WIDTH/8*HEIGHT,d1
+			jsr			clear
+
+		; dycp
+
+			jsr			dycp
+
+		; obliczenia 
+
 			clr.l			d1
 			move.l			#cosinus,a0
 			move.l			zoomz_index,d0
@@ -583,18 +589,12 @@ lp1:			move.l			pi,a1
 			cmpi.l			#4*PLOTS_NR,pi
 			bne			lp1
 
-		; dycp
-
-			jsr			dycp
-
-		; czyszczenie i rysowanie
-
+		; rysowanie linii
+		
 			move.l			buf_index,d0
 			move.l			#buf_tab,a0
 			move.l			(a0,d0),a2
 			move.l			#WIDTH/8*HEIGHT,d1
-			jsr			clear
-
 			jsr			draw_lines
 
 			addi.l			#4,buf_index
@@ -1254,7 +1254,7 @@ dycp_lp1:		clr.l			d0
 			addi.l			#1,dycp_sin_index
 			andi.l			#$ff,dycp_sin_index
 
-			sub.l			#1,dycp_scroll
+			sub.l			#2,dycp_scroll
 			bpl			dy1
 			move.l			#15,dycp_scroll
 			eor.l			#2,dycp_half
@@ -1279,6 +1279,17 @@ dycp_lp1:		clr.l			d0
 			move.b			txt_temp+9,d0
 			move.b			d0,txt_temp+8
 
+			clr.l			d1
+			move.l			txt_index,d0
+			move.l			#txt_full,a0
+			move.b			(a0,d0),d1
+			bne			not_txt_end
+			move.l			#0,txt_index
+			bra			dy1
+
+not_txt_end:		
+			move.b			d1,txt_temp+9
+			add.l			#1,txt_index
 
 dycp_no_new_char:
 
@@ -1320,10 +1331,6 @@ dycp_lp2:		clr.l			d0
 			move.w			d0,(a0)
 
 			rts
-
-dycp_sin_index:		dc.l			0
-dycp_scroll:		dc.l			0
-dycp_half:		dc.l			2
 
 ; =============================================================================
 ; Copy shifted char to btpl
@@ -1377,8 +1384,17 @@ ch3:			move.l			(a2),(a1,d1)
 ; =============================================================================
 
 			CNOP			0,4
-txt_temp:		dc.b			' welcome! '
-			CNOP			0,4
+
+dycp_sin_index:		dc.l			0
+dycp_scroll:		dc.l			0
+dycp_half:		dc.l			2
+txt_index:		dc.l			0
+		
+txt_full:		dc.b			'samar productions proudly present first amiga ocs production'
+			dc.b			'          '
+			dc.b			0
+
+txt_temp:		dc.b			'          '
 txt_spaces:		dc.b			'          '
 
 			CNOP			0,4
@@ -1573,6 +1589,12 @@ char_tab:
 ; -----------------------------------------------------------------------------
 
 			CNOP			0,4
+sprite_data:		dc.w			$70
+			dc.w			$70+100
+			blk.w			100,$55
+			dc.w			0
+
+			CNOP			0,4
 logo_bitplanes:
 			incbin			"gfx/SAMAR_logo_32col.raw"
 
@@ -1610,7 +1632,7 @@ logo_colors:
 vector_colors:
 			dc.w			BACKGROUND_COLOR,$0511,$0633,$0755,$0877,$0999,$0bbb,$0ddd
 			incbin			"gfx/fonty_dark.pal"
-
+	
 ; -----------------------------------------------------------------------------
 ; copperlista
 ; -----------------------------------------------------------------------------
@@ -1669,6 +1691,13 @@ cl_logo_colors:
 			dc.w			COLOR29,0
 			dc.w			COLOR30,0
 			dc.w			COLOR31,0
+
+		; -- sprite ---
+; cl_sprite:
+; 			dc.w			SPR0PTH,0
+; 			dc.w			SPR0PTL,0
+			; dc.w			SPR0POS,0
+			; dc.w			SPR0CTL,$ff00
 
 		; --- vector ---
 			dc.w			RASTER_VECTORS_CL-2,$ff00							; czekam na raster
