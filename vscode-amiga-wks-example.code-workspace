@@ -34,6 +34,8 @@
       "excludes": "**/.*"
     },
     "editor.formatOnSave": true,
-    "amiga-assembly.format.useTabs": true
+    "amiga-assembly.format.useTabs": true,
+    "editor.insertSpaces": false,
+    "editor.tabSize": 2
   }
 }
