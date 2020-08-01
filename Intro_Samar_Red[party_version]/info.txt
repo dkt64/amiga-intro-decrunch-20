@@ -1,0 +1,16 @@
+=======================================
+=    "Red" by Samar Productions       =
+= Released at Decrunch 2020 Demoparty =
+=     for Intro Competition           =
+=                                     =
+=  Intro credits:                     = 
+=  Music by      Jammer               =
+=  Graphics by   Isildur              =
+=  Code by       Don Kichote          =
+=                                     =
+=  Minimum requirements: stock A1200  =
+=                                     =
+=  This is [party version] release!   =
+=                                     =
+=   Samar Productions in 2020-08-01   =
+=======================================
