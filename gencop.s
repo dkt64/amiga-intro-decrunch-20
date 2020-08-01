@@ -597,6 +597,9 @@ lp1:			move.l			pi,a1
 			move.l			#WIDTH/8*HEIGHT,d1
 			jsr			draw_lines
 
+		; koniec my_fx
+
+
 			addi.l			#4,buf_index
 			cmpi.l			#buf_index_max,buf_index
 			bne			b1
@@ -916,11 +919,11 @@ rotate:
 			add.l			d7,d5
 	; przepisanie
 
-			divs			#256,d4
+			lsr.l			#8,d4
 			andi.l			#$ffff,d4
 			ext.l			d4
 
-			divs			#256,d5
+			lsr.l			#8,d5
 			andi.l			#$ffff,d5
 			ext.l			d5
 
@@ -948,11 +951,11 @@ rotate:
 			muls			d0,d5
 			sub.l			d7,d5
 	; przepisanie
-			divs			#256,d4
+			lsr.l			#8,d4
 			andi.l			#$ffff,d4
 			ext.l			d4
 
-			divs			#256,d5
+			lsr.l			#8,d5
 			andi.l			#$ffff,d5
 			ext.l			d5
 
@@ -980,11 +983,13 @@ rotate:
 			muls			d1,d7
 			add.l			d7,d5
 	; przepisanie
-			divs			#512,d4
+			lsr.l			#8,d4
+			lsr.l			#1,d4
 			andi.l			#$ffff,d4
 			ext.l			d4
 
-			divs			#512,d5
+			lsr.l			#8,d5
+			lsr.l			#1,d5
 			andi.l			#$ffff,d5
 			ext.l			d5
 
@@ -1241,7 +1246,6 @@ dycp_lp1:		clr.l			d0
 			move.l			(a4)+,d2
 			mulu.w			#WIDTH/8,d2
 			move.l			#0,d1
-			; move.l			#0,d2
 			add.l			d2,d1
 			jsr			put_char
 			add.l			#4,a1
@@ -1312,7 +1316,6 @@ dycp_lp2:		clr.l			d0
 			move.l			(a4)+,d2
 			mulu.w			#WIDTH/8,d2
 			move.l			#0,d1
-			; move.l			#0,d2
 			add.l			d2,d1
 			jsr			put_char
 			add.l			#4,a1
