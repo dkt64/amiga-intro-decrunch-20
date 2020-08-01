@@ -18,3 +18,6 @@ amigeconv.exe -f palette -c 8 -p loadrgb4 fonty.png fonty.pal
 
 amigeconv.exe -f bitplane -d 3 fonty_dark.png fonty_dark.raw
 amigeconv.exe -f palette -c 8 -p loadrgb4 fonty_dark.png fonty_dark.pal
+
+amigeconv.exe -f bitplane -d 5 SAMAR_logo02a_32col.png SAMAR_logo02a_32col.raw
+amigeconv.exe -f palette -c 32 -p loadrgb4 SAMAR_logo02a_32col.png SAMAR_logo02a_32col.pal
