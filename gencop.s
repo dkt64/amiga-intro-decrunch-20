@@ -31,7 +31,7 @@ YSTOP			EQU	44+256
 HSTRT			EQU	129
 WIDTH			EQU	320
 HEIGHT			EQU	256
-RES			EQU	8																	;8=lores, 4=hires
+RES			EQU	8											;8=lores, 4=hires
 
 LINE_WIDTH		EQU	WIDTH/8
 
@@ -113,24 +113,24 @@ init:
 
 		lea			CUSTOM,a6
 
-		move.w			#$0000,BPLCON0(a6)														; ilość bitplanów
-		move.w			#$0000,BPLCON1(a6)														; poziomy skrol = 0
-		move.w			#PF2PRI,BPLCON2(a6)														; playfield 2 z przodu
-		move.w			#$0000,BPL1MOD(a6)														; modulo1
-		move.w			#$0000,BPL2MOD(a6)														; modulo2
-		move.w			#(XSTRT+(YSTRT*256)),DIWSTRT(a6)												; DIWSTRT - górny-lewy róg ekranu (2c81)
-		move.w			#((XSTOP-256)+(YSTOP-256)*256),DIWSTOP(a6)											; DIWSTOP - dolny-prawy róg ekranu (c8d1)
-		move.w			#(HSTRT/2-RES),DDFSTRT(a6)													; DDFSTRT
-		move.w			#((HSTRT/2-RES)+(8*((WIDTH/16)-1))),DDFSTOP(a6)											; DDFSTOP
+		move.w			#$0000,BPLCON0(a6)								; ilość bitplanów
+		move.w			#$0000,BPLCON1(a6)								; poziomy skrol = 0
+		move.w			#PF2PRI,BPLCON2(a6)								; playfield 2 z przodu
+		move.w			#$0000,BPL1MOD(a6)								; modulo1
+		move.w			#$0000,BPL2MOD(a6)								; modulo2
+		move.w			#(XSTRT+(YSTRT*256)),DIWSTRT(a6)						; DIWSTRT - górny-lewy róg ekranu (2c81)
+		move.w			#((XSTOP-256)+(YSTOP-256)*256),DIWSTOP(a6)					; DIWSTOP - dolny-prawy róg ekranu (c8d1)
+		move.w			#(HSTRT/2-RES),DDFSTRT(a6)							; DDFSTRT
+		move.w			#((HSTRT/2-RES)+(8*((WIDTH/16)-1))),DDFSTOP(a6)					; DDFSTOP
 
 	; ---------------------------------------------------------------------
         ; DMA i IRQ
 	; ---------------------------------------------------------------------
 
-		move.w			#%1000000111000000,DMACON(a6)													; DMA set ON
-		move.w			#%0000000000111111,DMACON(a6)													; DMA set OFF
-		move.w			#%1100000000000000,INTENA(a6)													; IRQ set ON
-		move.w			#%0011111111111111,INTENA(a6)													; IRQ set OFF
+		move.w			#%1000000111000000,DMACON(a6)							; DMA set ON
+		move.w			#%0000000000111111,DMACON(a6)							; DMA set OFF
+		move.w			#%1100000000000000,INTENA(a6)							; IRQ set ON
+		move.w			#%0011111111111111,INTENA(a6)							; IRQ set OFF
 
 	; ---------------------------------------------------------------------
         ; Stworzenie copperlisty
@@ -478,7 +478,7 @@ raster:
 	; ---------------------------------------------------------------------
 
 		jsr			mt_music
-		lea			CUSTOM,a6															; przywracamy CUSTOM
+		lea			CUSTOM,a6									; przywracamy CUSTOM
 
 	; ---------------------------------------------------------------------
 	; FX
@@ -511,11 +511,11 @@ exit:
 		move.l			oldcopper,COP1LCH(a6)
 		move.l			gfxbase,a6
 		move.l			oldview,a1
-		jsr			-222(a6)															; LoadView
-		jsr			-270(a6)															; WaitTOF
-		jsr			-270(a6)															; WaitTOF
+		jsr			-222(a6)									; LoadView
+		jsr			-270(a6)									; WaitTOF
+		jsr			-270(a6)									; WaitTOF
 		move.l			$4,a6
-		jsr			-138(a6)															; Permit
+		jsr			-138(a6)									; Permit
 		rts
 
 ; =============================================================================
@@ -523,6 +523,8 @@ exit:
 ; =============================================================================
 
 my_fx:
+
+		jsr			dycp
 
 		clr.l			d1
 		move.l			#cosinus,a0
@@ -591,7 +593,6 @@ lp1:		move.l			pi,a1
 		move.l			#WIDTH/8*HEIGHT,d1
 		jsr			clear
 
-		jsr			dycp
 		jsr			draw_lines
 
 		addi.l			#4,buf_index
@@ -898,9 +899,9 @@ rotate:
 		clr.l			d6
 		move.l			ax,d3
 		asl			#1,d3
-		move.w			(a0,d3),d4															; sin
+		move.w			(a0,d3),d4									; sin
 		move.l			d4,d5
-		move.w			(a1,d3),d6															; cos
+		move.w			(a1,d3),d6									; cos
 		move.l			d6,d7
 	; y
 		muls			d1,d6
@@ -931,9 +932,9 @@ rotate:
 		clr.l			d6
 		move.l			ay,d3
 		asl			#1,d3
-		move.w			(a0,d3),d4															; sin
+		move.w			(a0,d3),d4									; sin
 		move.l			d4,d5
-		move.w			(a1,d3),d6															; cos
+		move.w			(a1,d3),d6									; cos
 		move.l			d6,d7
 	; x
 		muls			d0,d6
@@ -963,9 +964,9 @@ rotate:
 		clr.l			d6
 		move.l			az,d3
 		asl			#1,d3
-		move.w			(a0,d3),d4															; sin
+		move.w			(a0,d3),d4									; sin
 		move.l			d4,d5
-		move.w			(a1,d3),d6															; cos
+		move.w			(a1,d3),d6									; cos
 		move.l			d6,d7
 	; x
 		muls			d0,d6
@@ -1058,97 +1059,97 @@ persp:
 line:
 		movea.l			a2,a0
 
-		sub.w			d0,d2																; obliczamy różnicę x -> dx
-		bmi			xneg																; jeżeli ujemna to oktant 3,4,5,6
+		sub.w			d0,d2										; obliczamy różnicę x -> dx
+		bmi			xneg										; jeżeli ujemna to oktant 3,4,5,6
 
-		sub.w			d1,d3																; obliczamy różnicę y calculate dy, dx jest dodatnie więc oktant 1,2,7,8
-		bmi			yneg																; jeżeli dy ujemne oktant 7,8
-		cmp.w			d3,d2																; porównanie dx i dy - rozróżnienie pomiędzy oktantami 1,2
-		bmi			ygtx																; jeżeli y > x oktant 2
-		moveq.l			#OCTANT1+LINEMODE,d5														; jeżeli nie to otkant 1
+		sub.w			d1,d3										; obliczamy różnicę y calculate dy, dx jest dodatnie więc oktant 1,2,7,8
+		bmi			yneg										; jeżeli dy ujemne oktant 7,8
+		cmp.w			d3,d2										; porównanie dx i dy - rozróżnienie pomiędzy oktantami 1,2
+		bmi			ygtx										; jeżeli y > x oktant 2
+		moveq.l			#OCTANT1+LINEMODE,d5								; jeżeli nie to otkant 1
 		bra			lineagain
 ygtx:
-		exg			d2,d3																; x musi być większe od y - zamiana
-		moveq.l			#OCTANT2+LINEMODE,d5														; wybór oktant 2
+		exg			d2,d3										; x musi być większe od y - zamiana
+		moveq.l			#OCTANT2+LINEMODE,d5								; wybór oktant 2
 		bra			lineagain
 yneg:
-		neg.w			d3																; abs(dy)
-		cmp.w			d3,d2																; sprawdzamy pomedzy 7 i 8
-		bmi			ynygtx																; jeżeli y > x to oktant 7
-		moveq.l			#OCTANT8+LINEMODE,d5														; nie - 8
+		neg.w			d3										; abs(dy)
+		cmp.w			d3,d2										; sprawdzamy pomedzy 7 i 8
+		bmi			ynygtx										; jeżeli y > x to oktant 7
+		moveq.l			#OCTANT8+LINEMODE,d5								; nie - 8
 		bra			lineagain
 ynygtx:
-		exg			d2,d3																; x musi być większe od y - zamiana
-		moveq.l			#OCTANT7+LINEMODE,d5														; wybór oktant 7
+		exg			d2,d3										; x musi być większe od y - zamiana
+		moveq.l			#OCTANT7+LINEMODE,d5								; wybór oktant 7
 		bra			lineagain
 xneg:
-		neg.w			d2																; dx było ujemne więc negujemy, jesteśmy w oktant 3,4,5,6
-		sub.w			d1,d3																; obliczamy dy
-		bmi			xyneg																; jeżeli ujemne oktant 5,6
-		cmp.w			d3,d2																; jeżeli nie to 3,4
-		bmi			xnygtx																; jeżeli y > x, oktant 3
-		moveq.l			#OCTANT4+LINEMODE,d5														; jeżeli nie to 4
+		neg.w			d2										; dx było ujemne więc negujemy, jesteśmy w oktant 3,4,5,6
+		sub.w			d1,d3										; obliczamy dy
+		bmi			xyneg										; jeżeli ujemne oktant 5,6
+		cmp.w			d3,d2										; jeżeli nie to 3,4
+		bmi			xnygtx										; jeżeli y > x, oktant 3
+		moveq.l			#OCTANT4+LINEMODE,d5								; jeżeli nie to 4
 		bra			lineagain
 xnygtx:
-		exg			d2,d3																; x musi być większe od y - zamiana
-		moveq.l			#OCTANT3+LINEMODE,d5														; wybór oktant 3
+		exg			d2,d3										; x musi być większe od y - zamiana
+		moveq.l			#OCTANT3+LINEMODE,d5								; wybór oktant 3
 		bra			lineagain
 xyneg:
-		neg.w			d3																; y było ujemne więc negujemy, jesteśmy w oktant 5,6
-		cmp.w			d3,d2																; jeżeli y > x
-		bmi			xynygtx																; oktant 6
-		moveq.l			#OCTANT5+LINEMODE,d5														; nie - oktant 5
+		neg.w			d3										; y było ujemne więc negujemy, jesteśmy w oktant 5,6
+		cmp.w			d3,d2										; jeżeli y > x
+		bmi			xynygtx										; oktant 6
+		moveq.l			#OCTANT5+LINEMODE,d5								; nie - oktant 5
 		bra			lineagain
 xynygtx:
-		exg			d2,d3																; x musi być większe od y - zamiana
-		moveq.l			#OCTANT6+LINEMODE,d5														; wybór oktant 6
+		exg			d2,d3										; x musi być większe od y - zamiana
+		moveq.l			#OCTANT6+LINEMODE,d5								; wybór oktant 6
 
 lineagain:
 	; obliczamy początek (bajt w którym zaczynamy rysować)
 
-		ror.l			#4,d0																; move upper four bits into hi word
-		add.w			d0,d0																; mnożenie x 2
+		ror.l			#4,d0										; move upper four bits into hi word
+		add.w			d0,d0										; mnożenie x 2
 
-		mulu.w			d4,d1																; Obliczamy y1 * WIDTH
-		add.l			d1,a0																; ptr += (x1 >> 3)
-		add.w			d0,a0																; ptr += y1 * width
+		mulu.w			d4,d1										; Obliczamy y1 * WIDTH
+		add.l			d1,a0										; ptr += (x1 >> 3)
+		add.w			d0,a0										; ptr += y1 * width
 
-		swap			d0																; get the four bits of x1
-		or.w			#$BFA,d0															; or with USEA, USEC, USED, F=A+C
+		swap			d0										; get the four bits of x1
+		or.w			#$BFA,d0									; or with USEA, USEC, USED, F=A+C
 
-		lsl.w			#2,d3																; Y = 4 * Y
-		add.w			d2,d2																; X = 2 * X
-		move.w			d2,d1																; set up size word
-		lsl.w			#5,d1																; shift five left
-		add.w			#$42,d1																; and add 1 to height, 2 to width
+		lsl.w			#2,d3										; Y = 4 * Y
+		add.w			d2,d2										; X = 2 * X
+		move.w			d2,d1										; set up size word
+		lsl.w			#5,d1										; shift five left
+		add.w			#$42,d1										; and add 1 to height, 2 to width
 		
 		M_BLITTER_WAIT
 		
-		move.w			d3,BLTBMOD(a6)															; B mod = 4 * Y
+		move.w			d3,BLTBMOD(a6)									; B mod = 4 * Y
 		sub.w			d2,d3
 		ext.l			d3
-		move.l			d3,BLTAPT(a6)															; A ptr = 4 * Y - 2 * X
+		move.l			d3,BLTAPT(a6)									; A ptr = 4 * Y - 2 * X
 
 
 
-		bpl			lineover															; if negative,
-		or.w			#SIGNFLAG,d5															; set sign bit in con1
+		bpl			lineover									; if negative,
+		or.w			#SIGNFLAG,d5									; set sign bit in con1
 lineover:
 		; or.w			#2,d5										; SING bit for filling
 		
-		move.w			d0,BLTCON0(a6)															; write control registers
+		move.w			d0,BLTCON0(a6)									; write control registers
 		move.w			d5,BLTCON1(a6)
-		move.w			d4,BLTCMOD(a6)															; C mod = bitplane width
-		move.w			d4,BLTDMOD(a6)															; D mod = bitplane width
+		move.w			d4,BLTCMOD(a6)									; C mod = bitplane width
+		move.w			d4,BLTDMOD(a6)									; D mod = bitplane width
 		sub.w			d2,d3
-		move.w			d3,BLTAMOD(a6)															; A mod = 4 * Y - 4 * X
-		move.w			#$8000,BLTADAT(a6)														; A data = 0x8000
-		moveq.l			#-1,d5																; Set masks to all ones
-		move.l			d5,BLTAFWM(a6)															; we can hit both masks at once
-		move.l			a0,BLTCPT(a6)															; Pointer to first pixel to set
+		move.w			d3,BLTAMOD(a6)									; A mod = 4 * Y - 4 * X
+		move.w			#$8000,BLTADAT(a6)								; A data = 0x8000
+		moveq.l			#-1,d5										; Set masks to all ones
+		move.l			d5,BLTAFWM(a6)									; we can hit both masks at once
+		move.l			a0,BLTCPT(a6)									; Pointer to first pixel to set
 		move.l			a0,BLTDPT(a6)
-		move.w			d1,BLTSIZE(a6)															; Start blit
-		rts																			; and return, blit still in progress.
+		move.w			d1,BLTSIZE(a6)									; Start blit
+		rts													; and return, blit still in progress.
         
 ; =============================================================================
 ; Copy and fill
@@ -1206,11 +1207,11 @@ copy:
 clear:
 		M_BLITTER_WAIT
 
-		clr.w			BLTDMOD(a6)															;destination modulo
-		move.l			#$01000000,BLTCON0(a6)														;set operation type in BLTCON0/1
+		clr.w			BLTDMOD(a6)									;destination modulo
+		move.l			#$01000000,BLTCON0(a6)								;set operation type in BLTCON0/1
 		lsr.l			d1
-		move.l			a2,BLTDPTH(a6)															;destination address
-		move.w			d1,BLTSIZE(a6)															;blitter operation size
+		move.l			a2,BLTDPTH(a6)									;destination address
+		move.w			d1,BLTSIZE(a6)									;blitter operation size
 
 		rts
 
@@ -1232,7 +1233,7 @@ dycp_lp1:	clr			d0
 		jsr			put_char
 		add.l			#4,a1
 		add.l			#1,d3
-		cmp.l			#4,d3
+		cmp.l			#10,d3
 		bne			dycp_lp1
 
 		rts
@@ -1290,7 +1291,7 @@ ch3:		move.l			(a2),(a1,d1)
 ; =============================================================================
 
 		CNOP			0,4
-txt_temp:	dc.b			0,1,2,3
+txt_temp:	dc.b			' welcome! '
 
 		CNOP			0,4
 		; duże tablice
@@ -1415,17 +1416,63 @@ fonty:
 		include			"fonts.i"
 
 		CNOP			0,4
-char_tab:
-		dc.l			fonty+00*4+00*32*WIDTH/8,fonty+01*4+00*32*WIDTH/8,fonty+02*4+00*32*WIDTH/8,fonty+03*4+00*32*WIDTH/8,fonty+04*4+00*32*WIDTH/8
-		dc.l			fonty+05*4+00*32*WIDTH/8,fonty+06*4+00*32*WIDTH/8,fonty+07*4+00*32*WIDTH/8,fonty+08*4+00*32*WIDTH/8,fonty+09*4+00*32*WIDTH/8
-		dc.l			fonty+00*4+01*32*WIDTH/8,fonty+01*4+01*32*WIDTH/8,fonty+02*4+01*32*WIDTH/8,fonty+03*4+01*32*WIDTH/8,fonty+04*4+01*32*WIDTH/8
-		dc.l			fonty+05*4+01*32*WIDTH/8,fonty+06*4+01*32*WIDTH/8,fonty+07*4+01*32*WIDTH/8,fonty+08*4+01*32*WIDTH/8,fonty+09*4+01*32*WIDTH/8
-		dc.l			fonty+00*4+02*32*WIDTH/8,fonty+01*4+02*32*WIDTH/8,fonty+02*4+02*32*WIDTH/8,fonty+03*4+02*32*WIDTH/8,fonty+04*4+02*32*WIDTH/8
-		dc.l			fonty+05*4+02*32*WIDTH/8,fonty+06*4+02*32*WIDTH/8,fonty+07*4+02*32*WIDTH/8,fonty+08*4+02*32*WIDTH/8,fonty+09*4+02*32*WIDTH/8
-		dc.l			fonty+00*4+03*32*WIDTH/8,fonty+01*4+03*32*WIDTH/8,fonty+02*4+03*32*WIDTH/8,fonty+03*4+03*32*WIDTH/8,fonty+04*4+03*32*WIDTH/8
-		dc.l			fonty+05*4+03*32*WIDTH/8,fonty+06*4+03*32*WIDTH/8,fonty+07*4+03*32*WIDTH/8,fonty+08*4+03*32*WIDTH/8,fonty+09*4+03*32*WIDTH/8
-		dc.l			fonty+00*4+04*32*WIDTH/8,fonty+01*4+04*32*WIDTH/8,fonty+02*4+04*32*WIDTH/8,fonty+03*4+04*32*WIDTH/8,fonty+04*4+04*32*WIDTH/8
-		dc.l			fonty+05*4+04*32*WIDTH/8,fonty+06*4+04*32*WIDTH/8,fonty+07*4+04*32*WIDTH/8,fonty+08*4+04*32*WIDTH/8,fonty+09*4+04*32*WIDTH/8
+char_tab:	
+		blk.l			$20,fonty+chr_spacja
+
+		;			$20			$21			$22			$23
+		dc.l			fonty+chr_spacja,	fonty+chr_wykrzyknik,	fonty+chr_spacja,	fonty+chr_spacja
+		;			$24			$25			$26			$27
+		dc.l			fonty+chr_spacja,	fonty+chr_spacja,	fonty+chr_spacja,	fonty+chr_spacja
+		;			$28			$29			$2a			$2b
+		dc.l			fonty+chr_naw1,		fonty+chr_naw2,		fonty+chr_spacja,	fonty+chr_spacja
+		;			$2c			$2d			$2e			$2f
+		dc.l			fonty+chr_przecinek,	fonty+chr_spacja,	fonty+chr_kropka,	fonty+chr_spacja
+
+		;			$30			$31			$32			$33
+		dc.l			fonty+chr_0,		fonty+chr_1,		fonty+chr_2,		fonty+chr_3
+		;			$34			$35			$36			$37
+		dc.l			fonty+chr_4,		fonty+chr_5,		fonty+chr_6,		fonty+chr_7
+		;			$38			$39			$3a			$3b
+		dc.l			fonty+chr_8,		fonty+chr_9,		fonty+chr_spacja,	fonty+chr_spacja
+		;			$3c			$3d			$3e			$3f
+		dc.l			fonty+chr_spacja,	fonty+chr_spacja,	fonty+chr_spacja,	fonty+chr_pytanie
+
+		blk.l			$20,fonty+chr_spacja
+
+		;			$60			$61			$62			$63
+		dc.l			fonty+chr_spacja,	fonty+chr_a,		fonty+chr_b,		fonty+chr_c
+		;			$64			$65			$66			$67
+		dc.l			fonty+chr_d,		fonty+chr_e,		fonty+chr_f,		fonty+chr_g
+		;			$68			$69			$6a			$6b
+		dc.l			fonty+chr_h,		fonty+chr_i,		fonty+chr_j,		fonty+chr_k
+		;			$6c			$6d			$6e			$6f
+		dc.l			fonty+chr_l,		fonty+chr_m,		fonty+chr_n,		fonty+chr_o
+
+		;			$70			$71			$72			$73
+		dc.l			fonty+chr_p,		fonty+chr_q,		fonty+chr_r,		fonty+chr_s
+		;			$74			$75			$76			$77
+		dc.l			fonty+chr_t,		fonty+chr_u,		fonty+chr_v,		fonty+chr_w
+		;			$78			$79			$7a			$7b
+		dc.l			fonty+chr_x,		fonty+chr_y,		fonty+chr_z,		fonty+chr_spacja
+		;			$7c			$7d			$7e			$7f
+		dc.l			fonty+chr_spacja,	fonty+chr_spacja,	fonty+chr_spacja,	fonty+chr_spacja
+
+		; ---------------------------------------------------------------------
+
+		; a   b   c   d   e   f   g   h   i   j
+		; $61,$62,$63,$64,$65,$66,$67,$68,$69,$6A
+
+		; k   l   m   n   o   p   q   r   s   t
+		; $6B,$6C,$6D,$6E,$6F,$70,$71,$72,$73,$74
+
+		; u   v   w   x   y   z   .   ,   !   ?
+		; $75,$76,$77,$78,$79,$7a,$2e,$2c,$21,$3f
+
+		; '   "   0   1   2   3   4   5   6   7
+		; $20,$20,$30,$31,$32,$33,$34,$35,$36,$37
+
+		; 8   9   @   (   )
+		; $38,$39,$40,$28,$29
 
 ; =============================================================================
 ; CHIP RAM
@@ -1536,7 +1583,7 @@ cl_logo_colors:
 		dc.w			COLOR31,0
 
 		; --- vector ---
-		dc.w			RASTER_VECTORS_CL-2,$ff00													; czekam na raster
+		dc.w			RASTER_VECTORS_CL-2,$ff00							; czekam na raster
 
 cl_vector_colors:
 		dc.w			COLOR00,0
@@ -1556,7 +1603,7 @@ cl_vector_colors:
 		dc.w			COLOR14,0
 		dc.w			COLOR15,0
 
-		dc.w			RASTER_VECTORS_CL,$ff00														; czekam na raster
+		dc.w			RASTER_VECTORS_CL,$ff00								; czekam na raster
 
 cl_vector_bitplanes_nr:
 		dc.w			BPLCON0,0
@@ -1577,7 +1624,7 @@ cl_vector_address:
 		dc.w			BPL6PTL,0
 		dc.w			BPL6PTH,0
 
-		dc.l			$fffffffe															; tymczasowo
+		dc.l			$fffffffe									; tymczasowo
 
 ; =============================================================================
 ; MUZA
