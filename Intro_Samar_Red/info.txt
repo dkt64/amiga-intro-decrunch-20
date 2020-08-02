@@ -8,9 +8,7 @@
 =  Graphics by   Isildur              =
 =  Code by       Don Kichote          =
 =                                     =
-=  Minimum requirements: stock A1200  =
-=                                     =
-=  This is [party version] release!   =
+=    Minimum requirements: OCS/20     =
 =                                     =
 =   Samar Productions in 2020-08-01   =
 =======================================

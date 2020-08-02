@@ -98,7 +98,7 @@ init:
 
 			move.w			#$0000,BPLCON0(a6)								; ilość bitplanów
 			move.w			#$0000,BPLCON1(a6)								; poziomy skrol = 0
-			move.w			#PF2PRI,BPLCON2(a6)								; playfield 2 z przodu
+			move.w			#PF2PRI+$3f,BPLCON2(a6)								; playfield 2 z przodu
 			move.w			#$0000,BPL1MOD(a6)								; modulo1
 			move.w			#$0000,BPL2MOD(a6)								; modulo2
 			move.w			#(XSTRT+(YSTRT*256)),DIWSTRT(a6)						; DIWSTRT - górny-lewy róg ekranu (2c81)
@@ -110,14 +110,81 @@ init:
         ; DMA i IRQ
 	; ---------------------------------------------------------------------
 
-			move.w			#%1000000111000000,DMACON(a6)							; DMA set ON
-			move.w			#%0000000000111111,DMACON(a6)							; DMA set OFF
+			move.l			#empty_sprite,SPR0PTH
+			move.l			#empty_sprite,SPR1PTH
+			move.l			#empty_sprite,SPR2PTH
+			move.l			#empty_sprite,SPR3PTH
+			move.l			#empty_sprite,SPR4PTH
+			move.l			#empty_sprite,SPR5PTH
+			move.l			#empty_sprite,SPR6PTH
+			move.l			#empty_sprite,SPR7PTH
+
+			move.w			#%1000000111100000,DMACON(a6)							; DMA set ON
+			move.w			#%0000000000011111,DMACON(a6)							; DMA set OFF
 			move.w			#%1100000000000000,INTENA(a6)							; IRQ set ON
 			move.w			#%0011111111111111,INTENA(a6)							; IRQ set OFF
 
 	; ---------------------------------------------------------------------
         ; Stworzenie copperlisty
 	; ---------------------------------------------------------------------
+
+	; -- sprites ---
+
+			move.l			#sprite1_data,d0
+			move.l			#cl_sprite+2+4*00,a0
+			move.w			d0,(a0)
+			swap			d0
+			move.l			#cl_sprite+2+4*01,a0
+			move.w			d0,(a0)
+
+			move.l			#sprite2_data,d0
+			move.l			#cl_sprite+2+4*02,a0
+			move.w			d0,(a0)
+			swap			d0
+			move.l			#cl_sprite+2+4*03,a0
+			move.w			d0,(a0)
+
+			move.l			#sprite3_data,d0
+			move.l			#cl_sprite+2+4*04,a0
+			move.w			d0,(a0)
+			swap			d0
+			move.l			#cl_sprite+2+4*05,a0
+			move.w			d0,(a0)
+
+			move.l			#sprite4_data,d0
+			move.l			#cl_sprite+2+4*06,a0
+			move.w			d0,(a0)
+			swap			d0
+			move.l			#cl_sprite+2+4*07,a0
+			move.w			d0,(a0)
+
+			move.l			#empty_sprite,d0
+			move.l			#cl_sprite+2+4*08,a0
+			move.w			d0,(a0)
+			swap			d0
+			move.l			#cl_sprite+2+4*09,a0
+			move.w			d0,(a0)
+
+			move.l			#empty_sprite,d0
+			move.l			#cl_sprite+2+4*10,a0
+			move.w			d0,(a0)
+			swap			d0
+			move.l			#cl_sprite+2+4*11,a0
+			move.w			d0,(a0)
+
+			move.l			#empty_sprite,d0
+			move.l			#cl_sprite+2+4*12,a0
+			move.w			d0,(a0)
+			swap			d0
+			move.l			#cl_sprite+2+4*13,a0
+			move.w			d0,(a0)
+
+			move.l			#empty_sprite,d0
+			move.l			#cl_sprite+2+4*14,a0
+			move.w			d0,(a0)
+			swap			d0
+			move.l			#cl_sprite+2+4*15,a0
+			move.w			d0,(a0)
 
 	; -- logo ---
 
@@ -420,6 +487,12 @@ raster:
 			bne			raster
 
 	; ---------------------------------------------------------------------
+	; uruchomienie copperlisty
+	; ---------------------------------------------------------------------
+
+			move.l			#cl,COP1LCH(a6)
+
+	; ---------------------------------------------------------------------
 	; ustawienie adresów dla bitplanów vectora
 	; ---------------------------------------------------------------------
 
@@ -450,11 +523,6 @@ raster:
 			move.l			#cl_vector_address+2+4*09,a0
 			move.w			d0,(a0)
 
-	; ---------------------------------------------------------------------
-	; uruchomienie copperlisty
-	; ---------------------------------------------------------------------
-
-			move.l			#cl,COP1LCH(a6)
 
 	; ---------------------------------------------------------------------
 	; odtworzenie muzyki
@@ -1242,7 +1310,7 @@ dycp_lp1:		clr.l			d0
 			jsr			put_char
 			add.l			#4,a1
 			add.l			#1,d3
-			cmp.l			#9,d3
+			cmp.l			#10,d3
 			bne			dycp_lp1
 
 			; --- ruch ---
@@ -1316,7 +1384,7 @@ dycp_lp2:		clr.l			d0
 			jsr			put_char
 			add.l			#4,a1
 			add.l			#1,d3
-			cmp.l			#9,d3
+			cmp.l			#10,d3
 			bne			dycp_lp2
 
 
@@ -1586,6 +1654,28 @@ char_tab:
 ; -----------------------------------------------------------------------------
 
 			CNOP			0,4
+empty_sprite:		dc.l			$40004100
+			dc.l			$00000000
+			dc.l			0
+
+			CNOP			0,4
+sprite1_data:		dc.l			$70403002
+			blk.l			$130-$70,$ffffffff
+			dc.l			0
+
+sprite2_data:		dc.l			$70483002
+			blk.l			$130-$70,$ffffffff
+			dc.l			0
+
+sprite3_data:		dc.l			$70d03002
+			blk.l			$130-$70,$ffffffff
+			dc.l			0
+
+sprite4_data:		dc.l			$70d83002
+			blk.l			$130-$70,$ffffffff
+			dc.l			0
+
+			CNOP			0,4
 logo_bitplanes:
 			incbin			"gfx/SAMAR_logo_32col.raw"
 
@@ -1630,6 +1720,27 @@ vector_colors:
 
 			CNOP			0,4
 cl:
+
+			dc.w			$106,$0c00									;(AGA compat. if any Dual Playf. mode)
+
+cl_sprite:
+			dc.w			SPR0PTL,0
+			dc.w			SPR0PTH,0
+			dc.w			SPR1PTL,0
+			dc.w			SPR1PTH,0
+			dc.w			SPR2PTL,0
+			dc.w			SPR2PTH,0
+			dc.w			SPR3PTL,0
+			dc.w			SPR3PTH,0
+
+			dc.w			SPR4PTL,0
+			dc.w			SPR4PTH,0
+			dc.w			SPR5PTL,0
+			dc.w			SPR5PTH,0
+			dc.w			SPR6PTL,0
+			dc.w			SPR6PTH,0
+			dc.w			SPR7PTL,0
+			dc.w			SPR7PTH,0
 
 cl_logo_bitplanes_nr:
 			dc.w			BPLCON0,0
@@ -1704,6 +1815,27 @@ cl_vector_colors:
 			dc.w			COLOR14,0
 			dc.w			COLOR15,0
 
+cl_sprites_colors:
+			dc.w			COLOR16,BACKGROUND_COLOR
+			dc.w			COLOR17,BACKGROUND_COLOR
+			dc.w			COLOR18,BACKGROUND_COLOR
+			dc.w			COLOR19,BACKGROUND_COLOR
+
+			dc.w			COLOR20,BACKGROUND_COLOR
+			dc.w			COLOR21,BACKGROUND_COLOR
+			dc.w			COLOR22,BACKGROUND_COLOR
+			dc.w			COLOR23,BACKGROUND_COLOR
+
+			dc.w			COLOR24,BACKGROUND_COLOR
+			dc.w			COLOR25,BACKGROUND_COLOR
+			dc.w			COLOR26,BACKGROUND_COLOR
+			dc.w			COLOR27,BACKGROUND_COLOR
+
+			dc.w			COLOR28,BACKGROUND_COLOR
+			dc.w			COLOR29,BACKGROUND_COLOR
+			dc.w			COLOR30,BACKGROUND_COLOR
+			dc.w			COLOR31,BACKGROUND_COLOR
+
 			dc.w			RASTER_VECTORS_CL,$ff00								; czekam na raster
 
 cl_vector_bitplanes_nr:
@@ -1725,7 +1857,8 @@ cl_vector_address:
 			dc.w			BPL6PTL,0
 			dc.w			BPL6PTH,0
 
-			dc.l			$fffffffe									; tymczasowo
+			; dc.w			$ffdf,$fffe									; allow VPOS>$ff
+			dc.l			$fffffffe									; koniec
 
 ; =============================================================================
 ; MUZA
