@@ -1225,7 +1225,6 @@ dycp:
 			move.l			#txt_spaces,a3
 			move.l			#0,d3
 			move.l			dycp_sin_index,d4
-			lsl.l			#2,d4
 			move.l			#sinus_dycp,a4
 			add.l			d4,a4
 
@@ -1234,7 +1233,9 @@ dycp:
 
 dycp_lp1:		clr.l			d0
 			move.b			(a3,d3),d0
-			move.l			(a4)+,d2
+			clr.l			d2
+			move.b			(a4),d2
+			add.l			#16,a4
 			mulu.w			#WIDTH/8,d2
 			move.l			#0,d1
 			add.l			d2,d1
@@ -1246,7 +1247,7 @@ dycp_lp1:		clr.l			d0
 
 			; --- ruch ---
 
-			addi.l			#1,dycp_sin_index
+			addi.l			#2,dycp_sin_index
 			andi.l			#$ff,dycp_sin_index
 
 			sub.l			#2,dycp_scroll
@@ -1254,6 +1255,9 @@ dycp_lp1:		clr.l			d0
 			move.l			#15,dycp_scroll
 			eor.l			#2,dycp_half
 			beq			dycp_no_new_char
+
+			addi.l			#14,dycp_sin_index
+			andi.l			#$ff,dycp_sin_index
 
 			move.b			txt_temp+1,d0
 			move.b			d0,txt_temp+0
@@ -1295,7 +1299,6 @@ dy1:
 			move.l			#txt_temp,a3
 			move.l			#0,d3
 			move.l			dycp_sin_index,d4
-			lsl.l			#2,d4
 			move.l			#sinus_dycp,a4
 			add.l			d4,a4
 
@@ -1304,7 +1307,9 @@ dy1:
 
 dycp_lp2:		clr.l			d0
 			move.b			(a3,d3),d0
-			move.l			(a4)+,d2
+			clr.l			d2
+			move.b			(a4),d2
+			add.l			#16,a4
 			mulu.w			#WIDTH/8,d2
 			move.l			#0,d1
 			add.l			d2,d1
