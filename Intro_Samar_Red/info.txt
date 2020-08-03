@@ -1,14 +1,14 @@
 =======================================
 =    "Red" by Samar Productions       =
 = Released at Decrunch 2020 Demoparty =
-=     for Intro Competition           =
+=     for 40k Intro Competition       =
 =                                     =
 =  Intro credits:                     = 
 =  Music by      Jammer               =
 =  Graphics by   Isildur              =
 =  Code by       Don Kichote          =
 =                                     =
-=    Minimum requirements: OCS/20     =
+=             AMIGA OCS               =
 =                                     =
 =   Samar Productions in 2020-08-01   =
 =======================================

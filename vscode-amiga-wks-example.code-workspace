@@ -23,7 +23,7 @@
       "file": "bin/vlink",
       "includes": "*.s",
       "excludes": "",
-      "exefilename": "../fs-uae/hd0/gencop",
+      "exefilename": "../fs-uae/hd0/red-samar",
       "options": ["-bamigahunk", "-Bstatic"]
     },
     "amiga-assembly.adfgenerator": {
