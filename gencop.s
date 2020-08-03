@@ -579,6 +579,10 @@ exit:
 
 my_fx:
 
+		; dycp
+
+			jsr			dycp
+
 		; czyszczenie
 
 			move.l			buf_index,d0
@@ -587,9 +591,6 @@ my_fx:
 			move.l			#WIDTH/8*HEIGHT-VECTOR_BTPL_OFFSET*WIDTH/8,d1
 			jsr			clear
 
-		; dycp
-
-			jsr			dycp
 
 		; obliczenia 
 
