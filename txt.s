@@ -1,5 +1,6 @@
 
 txt_full:
+	dc.b	'                                                            '
 	dc.b	'samar productions proudly presents first amiga ocs production       '
 	dc.b	'released at decrunch demoparty in wroclaw in 2020       '
 	dc.b	'it was hard journey for me (dkt) for last 10 days to learn amiga coding but finally we made it       '
@@ -14,5 +15,4 @@ txt_full:
 	dc.b	"chorus, cncd, cocoon, conspiracy, crest, delysid, extend, fairlight, farbrausch, fossil, hitmen, hoaxers, "
 	dc.b	"inque, lft, madteam, mercury, nuance, onslaught, oxyron, padua, plastic, plush, prosonix, razor1911, resource, "
 	dc.b	"role, shape, siesta, smash, titan, triad, tbl, unique, wrath designs, ...                          "
-	dc.b	'          '
 	dc.b	0

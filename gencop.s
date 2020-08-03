@@ -38,7 +38,7 @@ LINE_WIDTH		EQU	WIDTH/8
 RASTER_VECTORS_CL	EQU	$7001
 VECTOR_BTPL_OFFSET	EQU	0
 VECTOR_Y_OFFSET		EQU	80
-VECTOR_MAX_ZOOM		EQU	200
+VECTOR_MAX_ZOOM		EQU	330
 
 PLOTS_NR		equ	14
 
@@ -576,6 +576,147 @@ exit:
 			rts
 
 ; =============================================================================
+; Obrót punktu
+; d0 - x
+; d1 - y
+; d2 - z
+; kąty w zmiennych ax,ay,az
+; =============================================================================
+
+			MACRO			M_ROTATE
+	; Rotation about the x axis:
+	; x' = x
+	; y' = cos(xangle) * y - sin(xangle) * z
+	; z' = sin(xangle) * y + cos(xangle) * z
+			clr.l			d4
+			clr.l			d6
+			move.l			ax,d3
+			asl			#1,d3
+			move.w			(a0,d3),d4									; sin
+			move.l			d4,d5
+			move.w			(a1,d3),d6									; cos
+			move.l			d6,d7
+	; y
+			muls			d1,d6
+			muls			d2,d4
+			sub.l			d6,d4
+	; z
+			muls			d1,d5
+			muls			d2,d7
+			add.l			d7,d5
+	; przepisanie
+
+			lsr.l			#8,d4
+			; andi.l			#$ffff,d4
+			ext.l			d4
+
+			lsr.l			#8,d5
+			; andi.l			#$ffff,d5
+			ext.l			d5
+
+			move.l			d4,d1
+			move.l			d5,d2
+
+	; Rotation about the y axis:
+	; x'' = cos(yangle) * x' + sin(yangle) * z'
+	; y'' = y'
+	; z'' = cos(yangle) * z' - sin(yangle) * x'
+			clr.l			d4
+			clr.l			d6
+			move.l			ay,d3
+			asl			#1,d3
+			move.w			(a0,d3),d4									; sin
+			move.l			d4,d5
+			move.w			(a1,d3),d6									; cos
+			move.l			d6,d7
+	; x
+			muls			d0,d6
+			muls			d2,d4
+			add.l			d6,d4
+	; z
+			muls			d2,d7
+			muls			d0,d5
+			sub.l			d7,d5
+	; przepisanie
+			lsr.l			#8,d4
+			; andi.l			#$ffff,d4
+			ext.l			d4
+
+			lsr.l			#8,d5
+			; andi.l			#$ffff,d5
+			ext.l			d5
+
+			move.l			d4,d0
+			move.l			d5,d2
+
+	; Rotation about the z axis:
+	; x''' = cos(zangle) * x'' - (sin(zangle) * y''
+	; y''' = sin(zangle) * x'' + (cos(zangle) * y''
+	; z''' = z''
+			clr.l			d4
+			clr.l			d6
+			move.l			az,d3
+			asl			#1,d3
+			move.w			(a0,d3),d4									; sin
+			move.l			d4,d5
+			move.w			(a1,d3),d6									; cos
+			move.l			d6,d7
+	; x
+			muls			d0,d6
+			muls			d1,d4
+			sub.l			d6,d4
+	; y
+			muls			d0,d5
+			muls			d1,d7
+			add.l			d7,d5
+	; przepisanie
+			lsr.l			#8,d4
+			lsr.l			#1,d4
+			; andi.l			#$ffff,d4
+			ext.l			d4
+
+			lsr.l			#8,d5
+			lsr.l			#1,d5
+			; andi.l			#$ffff,d5
+			ext.l			d5
+
+			move.l			d4,d0
+			move.l			d5,d1
+
+			ENDM
+
+; =============================================================================
+; Perspektywa
+; d0 - x
+; d1 - y
+; d2 - z
+; =============================================================================
+; X2D:=x*d/(z-z0);
+; Y2D:=y*d/(z-z0);
+
+			MACRO			M_PERSP
+	; d
+			move.l			#VECTOR_MAX_ZOOM,d3
+	; x*d
+			muls			d3,d0
+	; y*d
+			muls			d3,d1
+
+	; z-z0
+			subi.l			#2000,d2
+			add.w			zoomz,d2
+
+			divs			d2,d0
+			divs			d2,d1
+
+			; andi.l			#$ffff,d0
+			ext.l			d0
+			; andi.l			#$ffff,d1
+			ext.l			d1
+	
+			ENDM
+
+; =============================================================================
 ; Efekt
 ; =============================================================================
 
@@ -585,7 +726,7 @@ my_fx:
 
 			jsr			dycp
 
-		; ; czyszczenie
+		; czyszczenie
 
 			move.l			buf_index,d0
 			move.l			#buf_tab,a0
@@ -615,8 +756,8 @@ my_fx:
 		; andi.l			#1023,d0
 		; move.l			d0,zoomx_index
 
-			addi.l			#3,ax
-			addi.l			#4,ay
+			addi.l			#2,ax
+			addi.l			#-2,ay
 			addi.l			#5,az
 
 			andi.l			#1023,ax
@@ -637,8 +778,10 @@ lp1:			move.l			pi,a1
 			move.l			#sinus,a0
 			move.l			#cosinus,a1
 
-			jsr			rotate
-			jsr			persp
+			M_ROTATE
+			; jsr			rotate
+			M_PERSP
+			; jsr			persp
 
 			addi.l			#160,d0
 			add.l			zoomx,d0
@@ -890,65 +1033,65 @@ draw_lines:
 			move.l			#LINE_WIDTH,d4
 			jsr			line
 
-		; 6 przednia szpica
+		; ; 6 przednia szpica
 
-			move.l			pxa+00*4,d0
-			move.l			pya+00*4,d1
-			move.l			pxa+12*4,d2
-			move.l			pya+12*4,d3
-			move.l			#LINE_WIDTH,d4
-			jsr			line
+		; 	move.l			pxa+00*4,d0
+		; 	move.l			pya+00*4,d1
+		; 	move.l			pxa+12*4,d2
+		; 	move.l			pya+12*4,d3
+		; 	move.l			#LINE_WIDTH,d4
+		; 	jsr			line
 
-			move.l			pxa+01*4,d0
-			move.l			pya+01*4,d1
-			move.l			pxa+12*4,d2
-			move.l			pya+12*4,d3
-			move.l			#LINE_WIDTH,d4
-			jsr			line
+		; 	move.l			pxa+01*4,d0
+		; 	move.l			pya+01*4,d1
+		; 	move.l			pxa+12*4,d2
+		; 	move.l			pya+12*4,d3
+		; 	move.l			#LINE_WIDTH,d4
+		; 	jsr			line
 
-			move.l			pxa+02*4,d0
-			move.l			pya+02*4,d1
-			move.l			pxa+12*4,d2
-			move.l			pya+12*4,d3
-			move.l			#LINE_WIDTH,d4
-			jsr			line
+		; 	move.l			pxa+02*4,d0
+		; 	move.l			pya+02*4,d1
+		; 	move.l			pxa+12*4,d2
+		; 	move.l			pya+12*4,d3
+		; 	move.l			#LINE_WIDTH,d4
+		; 	jsr			line
 
-			move.l			pxa+03*4,d0
-			move.l			pya+03*4,d1
-			move.l			pxa+12*4,d2
-			move.l			pya+12*4,d3
-			move.l			#LINE_WIDTH,d4
-			jsr			line
+		; 	move.l			pxa+03*4,d0
+		; 	move.l			pya+03*4,d1
+		; 	move.l			pxa+12*4,d2
+		; 	move.l			pya+12*4,d3
+		; 	move.l			#LINE_WIDTH,d4
+		; 	jsr			line
 
-		; 6 tylna szpica
+		; ; 6 tylna szpica
 
-			move.l			pxa+04*4,d0
-			move.l			pya+04*4,d1
-			move.l			pxa+13*4,d2
-			move.l			pya+13*4,d3
-			move.l			#LINE_WIDTH,d4
-			jsr			line
+		; 	move.l			pxa+04*4,d0
+		; 	move.l			pya+04*4,d1
+		; 	move.l			pxa+13*4,d2
+		; 	move.l			pya+13*4,d3
+		; 	move.l			#LINE_WIDTH,d4
+		; 	jsr			line
 
-			move.l			pxa+05*4,d0
-			move.l			pya+05*4,d1
-			move.l			pxa+13*4,d2
-			move.l			pya+13*4,d3
-			move.l			#LINE_WIDTH,d4
-			jsr			line
+		; 	move.l			pxa+05*4,d0
+		; 	move.l			pya+05*4,d1
+		; 	move.l			pxa+13*4,d2
+		; 	move.l			pya+13*4,d3
+		; 	move.l			#LINE_WIDTH,d4
+		; 	jsr			line
 
-			move.l			pxa+06*4,d0
-			move.l			pya+06*4,d1
-			move.l			pxa+13*4,d2
-			move.l			pya+13*4,d3
-			move.l			#LINE_WIDTH,d4
-			jsr			line
+		; 	move.l			pxa+06*4,d0
+		; 	move.l			pya+06*4,d1
+		; 	move.l			pxa+13*4,d2
+		; 	move.l			pya+13*4,d3
+		; 	move.l			#LINE_WIDTH,d4
+		; 	jsr			line
 
-			move.l			pxa+07*4,d0
-			move.l			pya+07*4,d1
-			move.l			pxa+13*4,d2
-			move.l			pya+13*4,d3
-			move.l			#LINE_WIDTH,d4
-			jsr			line
+		; 	move.l			pxa+07*4,d0
+		; 	move.l			pya+07*4,d1
+		; 	move.l			pxa+13*4,d2
+		; 	move.l			pya+13*4,d3
+		; 	move.l			#LINE_WIDTH,d4
+		; 	jsr			line
 
 			rts
 
@@ -985,11 +1128,11 @@ rotate:
 	; przepisanie
 
 			lsr.l			#8,d4
-			andi.l			#$ffff,d4
+			; andi.l			#$ffff,d4
 			ext.l			d4
 
 			lsr.l			#8,d5
-			andi.l			#$ffff,d5
+			; andi.l			#$ffff,d5
 			ext.l			d5
 
 			move.l			d4,d1
@@ -1017,11 +1160,11 @@ rotate:
 			sub.l			d7,d5
 	; przepisanie
 			lsr.l			#8,d4
-			andi.l			#$ffff,d4
+			; andi.l			#$ffff,d4
 			ext.l			d4
 
 			lsr.l			#8,d5
-			andi.l			#$ffff,d5
+			; andi.l			#$ffff,d5
 			ext.l			d5
 
 			move.l			d4,d0
@@ -1050,12 +1193,12 @@ rotate:
 	; przepisanie
 			lsr.l			#8,d4
 			lsr.l			#1,d4
-			andi.l			#$ffff,d4
+			; andi.l			#$ffff,d4
 			ext.l			d4
 
 			lsr.l			#8,d5
 			lsr.l			#1,d5
-			andi.l			#$ffff,d5
+			; andi.l			#$ffff,d5
 			ext.l			d5
 
 			move.l			d4,d0
@@ -1537,7 +1680,8 @@ zoomz:			dc.l			0
 zoomx_index:	
 			dc.l			0
 zoomz_index:	
-			dc.l			0
+			dc.l			512
+
 pi:			dc.l			0
 
 px:
@@ -1778,7 +1922,11 @@ vector_colors:
 cl:
 
 			; dc.w			$1fc,0
-			; dc.w			$106,$0c00									;(AGA compat. if any Dual Playf. mode)
+			dc.w			$106,$0c00									;(AGA compat. if any Dual Playf. mode)
+
+cl_logo_bitplanes_nr:
+			dc.w			BPLCON0,0
+			dc.w			BPLCON1,0
 
 cl_logo_address:
 			dc.w			BPL1PTL,0
@@ -1846,15 +1994,16 @@ cl_logo_colors:
 			dc.w			COLOR30,0
 			dc.w			COLOR31,0
 
-cl_logo_bitplanes_nr:
-			dc.w			BPLCON0,0
-			dc.w			BPLCON1,0
-
 			; dc.l			$fffffffe									; koniec
 
 		; --- vector ---
 
-			dc.w			RASTER_VECTORS_CL-4,$ff00							; czekam na raster
+			dc.w			RASTER_VECTORS_CL-2,$ff00							; czekam na raster
+
+cl_vector_bitplanes_nr:
+			dc.w			BPLCON0,0
+cl_scroll:
+			dc.w			BPLCON1,$000f
 
 cl_vector_address:
 			dc.w			BPL1PTL,0
@@ -1909,12 +2058,7 @@ cl_sprites_colors:
 			dc.w			COLOR30,BACKGROUND_COLOR
 			dc.w			COLOR31,BACKGROUND_COLOR
 
-			dc.w			RASTER_VECTORS_CL,$ff00								; czekam na raster
-
-cl_vector_bitplanes_nr:
-			dc.w			BPLCON0,0
-cl_scroll:
-			dc.w			BPLCON1,$000f
+			; dc.w			RASTER_VECTORS_CL,$ff00								; czekam na raster
 
 			; dc.w			$ffdf,$fffe									; allow VPOS>$ff
 			dc.l			$fffffffe									; koniec
