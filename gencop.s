@@ -38,7 +38,7 @@ LINE_WIDTH		EQU	WIDTH/8
 RASTER_VECTORS_CL	EQU	$7001
 VECTOR_BTPL_OFFSET	EQU	0
 VECTOR_Y_OFFSET		EQU	80
-VECTOR_MAX_ZOOM		EQU	300
+VECTOR_MAX_ZOOM		EQU	250
 
 PLOTS_NR		equ	14
 
@@ -101,7 +101,8 @@ init:
 
 			move.w			#$0000,BPLCON0(a6)								; ilość bitplanów
 			move.w			#$0000,BPLCON1(a6)								; poziomy skrol = 0
-			move.w			#PF2PRI+$38,BPLCON2(a6)								; playfield 2 z przodu
+			; move.w			#PF2PRI,BPLCON2(a6)								; playfield 2 z przodu
+			move.w			#$07,BPLCON2(a6)								; playfield 2 z przodu
 			move.w			#$0000,BPL1MOD(a6)								; modulo1
 			move.w			#$0000,BPL2MOD(a6)								; modulo2
 			move.w			#(XSTRT+(YSTRT*256)),DIWSTRT(a6)						; DIWSTRT - górny-lewy róg ekranu (2c81)
@@ -1775,7 +1776,8 @@ vector_colors:
 			CNOP			0,4
 cl:
 
-			dc.w			$106,$0c00									;(AGA compat. if any Dual Playf. mode)
+			; dc.w			$1fc,0
+			; dc.w			$106,$0c00									;(AGA compat. if any Dual Playf. mode)
 
 cl_logo_bitplanes_nr:
 			dc.w			BPLCON0,0
@@ -1914,7 +1916,7 @@ cl_sprites_colors:
 
 			dc.w			RASTER_VECTORS_CL,$ff00								; czekam na raster
 
-			dc.w			$ffdf,$fffe									; allow VPOS>$ff
+			; dc.w			$ffdf,$fffe									; allow VPOS>$ff
 			dc.l			$fffffffe									; koniec
 
 ; =============================================================================
