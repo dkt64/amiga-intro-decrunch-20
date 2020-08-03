@@ -1513,7 +1513,7 @@ txt_index:		dc.l			0
 		
 			include			"txt.s"
 			
-txt_temp:		dc.b			'a         '
+txt_temp:		dc.b			'          '
 txt_spaces:		dc.b			'          '
 
 			CNOP			0,4
