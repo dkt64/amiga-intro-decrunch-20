@@ -37,7 +37,7 @@ LINE_WIDTH		EQU	WIDTH/8
 
 RASTER_VECTORS_CL	EQU	$7001
 VECTOR_BTPL_OFFSET	EQU	0
-VECTOR_Y_OFFSET		EQU	80
+VECTOR_Y_OFFSET		EQU	90
 VECTOR_MAX_ZOOM		EQU	330
 
 PLOTS_NR		equ	14
@@ -233,136 +233,6 @@ init:
 			move.l			#cl_logo_address+2+4*09,a0
 			move.w			d0,(a0)
 
-	; kolory logo
-	
-			move.w			logo_colors+2*00,d0
-			move.l			#cl_logo_colors+2+4*00,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*01,d0
-			move.l			#cl_logo_colors+2+4*01,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*02,d0
-			move.l			#cl_logo_colors+2+4*02,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*03,d0
-			move.l			#cl_logo_colors+2+4*03,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*04,d0
-			move.l			#cl_logo_colors+2+4*04,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*05,d0
-			move.l			#cl_logo_colors+2+4*05,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*06,d0
-			move.l			#cl_logo_colors+2+4*06,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*07,d0
-			move.l			#cl_logo_colors+2+4*07,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*08,d0
-			move.l			#cl_logo_colors+2+4*08,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*09,d0
-			move.l			#cl_logo_colors+2+4*09,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*10,d0
-			move.l			#cl_logo_colors+2+4*10,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*11,d0
-			move.l			#cl_logo_colors+2+4*11,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*12,d0
-			move.l			#cl_logo_colors+2+4*12,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*13,d0
-			move.l			#cl_logo_colors+2+4*13,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*14,d0
-			move.l			#cl_logo_colors+2+4*14,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*15,d0
-			move.l			#cl_logo_colors+2+4*15,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*16,d0
-			move.l			#cl_logo_colors+2+4*16,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*17,d0
-			move.l			#cl_logo_colors+2+4*17,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*18,d0
-			move.l			#cl_logo_colors+2+4*18,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*19,d0
-			move.l			#cl_logo_colors+2+4*19,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*20,d0
-			move.l			#cl_logo_colors+2+4*20,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*21,d0
-			move.l			#cl_logo_colors+2+4*21,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*22,d0
-			move.l			#cl_logo_colors+2+4*22,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*23,d0
-			move.l			#cl_logo_colors+2+4*23,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*24,d0
-			move.l			#cl_logo_colors+2+4*24,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*25,d0
-			move.l			#cl_logo_colors+2+4*25,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*26,d0
-			move.l			#cl_logo_colors+2+4*26,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*27,d0
-			move.l			#cl_logo_colors+2+4*27,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*28,d0
-			move.l			#cl_logo_colors+2+4*28,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*29,d0
-			move.l			#cl_logo_colors+2+4*29,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*30,d0
-			move.l			#cl_logo_colors+2+4*30,a0
-			move.w			d0,(a0)
-
-			move.w			logo_colors+2*31,d0
-			move.l			#cl_logo_colors+2+4*31,a0
-			move.w			d0,(a0)
-
 	; -----------------------------------------------------------------------------
 	; --- vector + scroll ---
 	; -----------------------------------------------------------------------------
@@ -393,74 +263,6 @@ init:
 			move.w			d0,(a0)
 			swap			d0
 			move.l			#cl_vector_address+2+4*09,a0
-			move.w			d0,(a0)
-
-	; kolory vector
-	
-			move.w			vector_colors+2*00,d0
-			move.l			#cl_vector_colors+2+4*00,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*01,d0
-			move.l			#cl_vector_colors+2+4*01,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*02,d0
-			move.l			#cl_vector_colors+2+4*02,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*03,d0
-			move.l			#cl_vector_colors+2+4*03,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*04,d0
-			move.l			#cl_vector_colors+2+4*04,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*05,d0
-			move.l			#cl_vector_colors+2+4*05,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*06,d0
-			move.l			#cl_vector_colors+2+4*06,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*07,d0
-			move.l			#cl_vector_colors+2+4*07,a0
-			move.w			d0,(a0)
-
-	; kolory scroll
-	
-			move.w			vector_colors+2*08,d0
-			move.l			#cl_vector_colors+2+4*08,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*09,d0
-			move.l			#cl_vector_colors+2+4*09,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*10,d0
-			move.l			#cl_vector_colors+2+4*10,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*11,d0
-			move.l			#cl_vector_colors+2+4*11,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*12,d0
-			move.l			#cl_vector_colors+2+4*12,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*13,d0
-			move.l			#cl_vector_colors+2+4*13,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*14,d0
-			move.l			#cl_vector_colors+2+4*14,a0
-			move.w			d0,(a0)
-
-			move.w			vector_colors+2*15,d0
-			move.l			#cl_vector_colors+2+4*15,a0
 			move.w			d0,(a0)
 
 	; =====================================================================
@@ -537,11 +339,56 @@ raster:
 			jsr			mt_music
 			lea			CUSTOM,a6									; przywracamy CUSTOM
 
+			addi.l			#1,time
+			
 	; ---------------------------------------------------------------------
-	; FX
+	; timeline
 	; ---------------------------------------------------------------------
 
+		; rytm
+
+			move.w			mt_PatternPos,d0
+			bne			zmiana1
+			cmp			pattern_pos_prev,d0
+			beq			zmiana1
+			neg.l			ax_add
+			neg.l			ay_add
+			neg.l			az_add
+zmiana1:
+			move			d0,pattern_pos_prev
+
+	; ---------------------------------------------------------------------
+
+		; show logo
+
+			cmpi.l			#200,time
+			bne			zmiana2
+
+			jsr			show_logo
+
+zmiana2:
+
+	; ---------------------------------------------------------------------
+
+		; show dycp
+
+			cmpi.l			#370,time
+			bcs			zmiana3
+
+			jsr			show_scroll
 			jsr			my_fx
+zmiana3:
+
+	; ---------------------------------------------------------------------
+
+		; show vector
+
+			cmpi.l			#970,time
+			bne			zmiana4
+
+			jsr			show_vector
+
+zmiana4:
 
 	; ---------------------------------------------------------------------
 	; sprawdzenie myszki i joya (wyjście z programu)
@@ -756,9 +603,12 @@ my_fx:
 		; andi.l			#1023,d0
 		; move.l			d0,zoomx_index
 
-			addi.l			#2,ax
-			addi.l			#-2,ay
-			addi.l			#5,az
+			move.l			ax_add,d0
+			add.l			d0,ax
+			move.l			ay_add,d0
+			add.l			d0,ay
+			move.l			az_add,d0
+			add.l			d0,az
 
 			andi.l			#1023,ax
 			andi.l			#1023,ay
@@ -1645,11 +1495,221 @@ ch3:			move.l			(a2),(a1,d1)
 			rts
 
 ; =============================================================================
+; kolory logo
+; =============================================================================
+
+show_logo:	
+			move.w			logo_colors+2*00,d0
+			move.l			#cl_logo_colors+2+4*00,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*01,d0
+			move.l			#cl_logo_colors+2+4*01,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*02,d0
+			move.l			#cl_logo_colors+2+4*02,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*03,d0
+			move.l			#cl_logo_colors+2+4*03,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*04,d0
+			move.l			#cl_logo_colors+2+4*04,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*05,d0
+			move.l			#cl_logo_colors+2+4*05,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*06,d0
+			move.l			#cl_logo_colors+2+4*06,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*07,d0
+			move.l			#cl_logo_colors+2+4*07,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*08,d0
+			move.l			#cl_logo_colors+2+4*08,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*09,d0
+			move.l			#cl_logo_colors+2+4*09,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*10,d0
+			move.l			#cl_logo_colors+2+4*10,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*11,d0
+			move.l			#cl_logo_colors+2+4*11,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*12,d0
+			move.l			#cl_logo_colors+2+4*12,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*13,d0
+			move.l			#cl_logo_colors+2+4*13,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*14,d0
+			move.l			#cl_logo_colors+2+4*14,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*15,d0
+			move.l			#cl_logo_colors+2+4*15,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*16,d0
+			move.l			#cl_logo_colors+2+4*16,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*17,d0
+			move.l			#cl_logo_colors+2+4*17,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*18,d0
+			move.l			#cl_logo_colors+2+4*18,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*19,d0
+			move.l			#cl_logo_colors+2+4*19,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*20,d0
+			move.l			#cl_logo_colors+2+4*20,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*21,d0
+			move.l			#cl_logo_colors+2+4*21,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*22,d0
+			move.l			#cl_logo_colors+2+4*22,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*23,d0
+			move.l			#cl_logo_colors+2+4*23,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*24,d0
+			move.l			#cl_logo_colors+2+4*24,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*25,d0
+			move.l			#cl_logo_colors+2+4*25,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*26,d0
+			move.l			#cl_logo_colors+2+4*26,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*27,d0
+			move.l			#cl_logo_colors+2+4*27,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*28,d0
+			move.l			#cl_logo_colors+2+4*28,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*29,d0
+			move.l			#cl_logo_colors+2+4*29,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*30,d0
+			move.l			#cl_logo_colors+2+4*30,a0
+			move.w			d0,(a0)
+
+			move.w			logo_colors+2*31,d0
+			move.l			#cl_logo_colors+2+4*31,a0
+			move.w			d0,(a0)
+
+			rts
+
+; =============================================================================
+; kolory vector
+; =============================================================================
+
+show_vector:	
+			move.w			vector_colors+2*08,d0
+			move.l			#cl_vector_colors+2+4*00,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*09,d0
+			move.l			#cl_vector_colors+2+4*01,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*10,d0
+			move.l			#cl_vector_colors+2+4*02,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*11,d0
+			move.l			#cl_vector_colors+2+4*03,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*12,d0
+			move.l			#cl_vector_colors+2+4*04,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*13,d0
+			move.l			#cl_vector_colors+2+4*05,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*14,d0
+			move.l			#cl_vector_colors+2+4*06,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*15,d0
+			move.l			#cl_vector_colors+2+4*07,a0
+			move.w			d0,(a0)
+
+			rts
+
+show_scroll:
+
+			move.w			vector_colors+2*00,d0
+			move.l			#cl_vector_colors+2+4*08,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*01,d0
+			move.l			#cl_vector_colors+2+4*09,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*02,d0
+			move.l			#cl_vector_colors+2+4*10,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*03,d0
+			move.l			#cl_vector_colors+2+4*11,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*04,d0
+			move.l			#cl_vector_colors+2+4*12,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*05,d0
+			move.l			#cl_vector_colors+2+4*13,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*06,d0
+			move.l			#cl_vector_colors+2+4*14,a0
+			move.w			d0,(a0)
+
+			move.w			vector_colors+2*07,d0
+			move.l			#cl_vector_colors+2+4*15,a0
+			move.w			d0,(a0)
+
+			rts
+
+; =============================================================================
 ; DANE
 ; =============================================================================
 
 			CNOP			0,4
-
+time:			dc.l			0
 dycp_sin_index:		dc.l			0
 dycp_scroll:		dc.l			0
 dycp_half:		dc.l			2
@@ -1714,9 +1774,17 @@ pxa:
 pya:
 			blk.l			14,0
 
+			CNOP			0,4
+
 ax:			dc.l			0
 ay:			dc.l			0
 az:			dc.l			0
+
+ax_add:			dc.l			-4
+ay_add:			dc.l			-3
+az_add:			dc.l			6
+
+pattern_pos_prev	dc.l			0
 
 			CNOP			0,4
 
@@ -1961,49 +2029,44 @@ cl_sprite:
 			dc.w			SPR7PTH,0
 
 cl_logo_colors:
-			dc.w			COLOR00,0
-			dc.w			COLOR01,0
-			dc.w			COLOR02,0
-			dc.w			COLOR03,0
-			dc.w			COLOR04,0
-			dc.w			COLOR05,0
-			dc.w			COLOR06,0
-			dc.w			COLOR07,0
-			dc.w			COLOR08,0
-			dc.w			COLOR09,0
-			dc.w			COLOR10,0
-			dc.w			COLOR11,0
-			dc.w			COLOR12,0
-			dc.w			COLOR13,0
-			dc.w			COLOR14,0
-			dc.w			COLOR15,0
-			dc.w			COLOR16,0
-			dc.w			COLOR17,0
-			dc.w			COLOR18,0
-			dc.w			COLOR19,0
-			dc.w			COLOR20,0
-			dc.w			COLOR21,0
-			dc.w			COLOR22,0
-			dc.w			COLOR23,0
-			dc.w			COLOR24,0
-			dc.w			COLOR25,0
-			dc.w			COLOR26,0
-			dc.w			COLOR27,0
-			dc.w			COLOR28,0
-			dc.w			COLOR29,0
-			dc.w			COLOR30,0
-			dc.w			COLOR31,0
+			dc.w			COLOR00,BACKGROUND_COLOR
+			dc.w			COLOR01,BACKGROUND_COLOR
+			dc.w			COLOR02,BACKGROUND_COLOR
+			dc.w			COLOR03,BACKGROUND_COLOR
+			dc.w			COLOR04,BACKGROUND_COLOR
+			dc.w			COLOR05,BACKGROUND_COLOR
+			dc.w			COLOR06,BACKGROUND_COLOR
+			dc.w			COLOR07,BACKGROUND_COLOR
+			dc.w			COLOR08,BACKGROUND_COLOR
+			dc.w			COLOR09,BACKGROUND_COLOR
+			dc.w			COLOR10,BACKGROUND_COLOR
+			dc.w			COLOR11,BACKGROUND_COLOR
+			dc.w			COLOR12,BACKGROUND_COLOR
+			dc.w			COLOR13,BACKGROUND_COLOR
+			dc.w			COLOR14,BACKGROUND_COLOR
+			dc.w			COLOR15,BACKGROUND_COLOR
+			dc.w			COLOR16,BACKGROUND_COLOR
+			dc.w			COLOR17,BACKGROUND_COLOR
+			dc.w			COLOR18,BACKGROUND_COLOR
+			dc.w			COLOR19,BACKGROUND_COLOR
+			dc.w			COLOR20,BACKGROUND_COLOR
+			dc.w			COLOR21,BACKGROUND_COLOR
+			dc.w			COLOR22,BACKGROUND_COLOR
+			dc.w			COLOR23,BACKGROUND_COLOR
+			dc.w			COLOR24,BACKGROUND_COLOR
+			dc.w			COLOR25,BACKGROUND_COLOR
+			dc.w			COLOR26,BACKGROUND_COLOR
+			dc.w			COLOR27,BACKGROUND_COLOR
+			dc.w			COLOR28,BACKGROUND_COLOR
+			dc.w			COLOR29,BACKGROUND_COLOR
+			dc.w			COLOR30,BACKGROUND_COLOR
+			dc.w			COLOR31,BACKGROUND_COLOR
 
 			; dc.l			$fffffffe									; koniec
 
 		; --- vector ---
 
-			dc.w			RASTER_VECTORS_CL-2,$ff00							; czekam na raster
-
-cl_vector_bitplanes_nr:
-			dc.w			BPLCON0,0
-cl_scroll:
-			dc.w			BPLCON1,$000f
+			dc.w			RASTER_VECTORS_CL-4,$ff00							; czekam na raster
 
 cl_vector_address:
 			dc.w			BPL1PTL,0
@@ -2019,23 +2082,29 @@ cl_vector_address:
 			dc.w			BPL6PTL,0
 			dc.w			BPL6PTH,0
 
+cl_vector_bitplanes_nr:
+			dc.w			BPLCON0,0
+cl_scroll:
+			dc.w			BPLCON1,$000f
+
 cl_vector_colors:
-			dc.w			COLOR00,0
-			dc.w			COLOR01,0
-			dc.w			COLOR02,0
-			dc.w			COLOR03,0
-			dc.w			COLOR04,0
-			dc.w			COLOR05,0
-			dc.w			COLOR06,0
-			dc.w			COLOR07,0
-			dc.w			COLOR08,0
-			dc.w			COLOR09,0
-			dc.w			COLOR10,0
-			dc.w			COLOR11,0
-			dc.w			COLOR12,0
-			dc.w			COLOR13,0
-			dc.w			COLOR14,0
-			dc.w			COLOR15,0
+			dc.w			COLOR08,BACKGROUND_COLOR
+			dc.w			COLOR09,BACKGROUND_COLOR
+			dc.w			COLOR10,BACKGROUND_COLOR
+			dc.w			COLOR11,BACKGROUND_COLOR
+			dc.w			COLOR12,BACKGROUND_COLOR
+			dc.w			COLOR13,BACKGROUND_COLOR
+			dc.w			COLOR14,BACKGROUND_COLOR
+			dc.w			COLOR15,BACKGROUND_COLOR
+			dc.w			COLOR00,BACKGROUND_COLOR
+			dc.w			COLOR01,BACKGROUND_COLOR
+			dc.w			COLOR02,BACKGROUND_COLOR
+			dc.w			COLOR03,BACKGROUND_COLOR
+			dc.w			COLOR04,BACKGROUND_COLOR
+			dc.w			COLOR05,BACKGROUND_COLOR
+			dc.w			COLOR06,BACKGROUND_COLOR
+			dc.w			COLOR07,BACKGROUND_COLOR
+
 
 cl_sprites_colors:
 			dc.w			COLOR16,BACKGROUND_COLOR
@@ -2058,7 +2127,7 @@ cl_sprites_colors:
 			dc.w			COLOR30,BACKGROUND_COLOR
 			dc.w			COLOR31,BACKGROUND_COLOR
 
-			; dc.w			RASTER_VECTORS_CL,$ff00								; czekam na raster
+			; dc.w			RASTER_VECTORS_CL+2,$ff00							; czekam na raster
 
 			; dc.w			$ffdf,$fffe									; allow VPOS>$ff
 			dc.l			$fffffffe									; koniec
