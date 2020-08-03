@@ -492,6 +492,12 @@ raster:
 			bne			raster
 
 	; ---------------------------------------------------------------------
+	; uruchomienie copperlisty
+	; ---------------------------------------------------------------------
+
+			move.l			#cl,COP1LCH(a6)
+
+	; ---------------------------------------------------------------------
 	; ustawienie adresów dla bitplanów vectora
 	; ---------------------------------------------------------------------
 
@@ -521,12 +527,6 @@ raster:
 			swap			d0
 			move.l			#cl_vector_address+2+4*09,a0
 			move.w			d0,(a0)
-
-	; ---------------------------------------------------------------------
-	; uruchomienie copperlisty
-	; ---------------------------------------------------------------------
-
-			move.l			#cl,COP1LCH(a6)
 
 	; ---------------------------------------------------------------------
 	; odtworzenie muzyki
@@ -583,14 +583,13 @@ my_fx:
 
 			jsr			dycp
 
-		; czyszczenie
+		; ; czyszczenie
 
 			move.l			buf_index,d0
 			move.l			#buf_tab,a0
 			move.l			(a0,d0),a2
 			move.l			#WIDTH/8*HEIGHT-VECTOR_BTPL_OFFSET*WIDTH/8,d1
 			jsr			clear
-
 
 		; obliczenia 
 
@@ -652,6 +651,7 @@ lp1:			move.l			pi,a1
 			addi.l			#4,pi
 			cmpi.l			#4*PLOTS_NR,pi
 			bne			lp1
+
 
 		; rysowanie linii
 		
@@ -1358,7 +1358,7 @@ dycp_lp1:		clr.l			d0
 			mulu.w			#WIDTH/8,d2
 			move.l			#0,d1
 			add.l			d2,d1
-			; jsr			put_char_blitter
+			; jsr			put_char
 			M_PUT_CHAR_BLITTER
 			add.l			#4,a1
 			add.l			#1,d3
@@ -1433,7 +1433,7 @@ dycp_lp2:		clr.l			d0
 			mulu.w			#WIDTH/8,d2
 			move.l			#0,d1
 			add.l			d2,d1
-			; jsr			put_char_blitter
+			; jsr			put_char
 			M_PUT_CHAR_BLITTER
 			add.l			#4,a1
 			add.l			#1,d3
@@ -1732,6 +1732,7 @@ sprite4_data:		dc.l			$70d83002
 logo_bitplanes:
 			incbin			"gfx/SAMAR_logo_32col.raw"
 
+	; bufor żeby nie nachodziło na dalsze regiony
 ; empty_buf1:
 			blk.b			WIDTH/8*HEIGHT,0
 
@@ -1776,6 +1777,24 @@ cl:
 
 			dc.w			$106,$0c00									;(AGA compat. if any Dual Playf. mode)
 
+cl_logo_bitplanes_nr:
+			dc.w			BPLCON0,0
+			dc.w			BPLCON1,0
+
+cl_logo_address:
+			dc.w			BPL1PTL,0
+			dc.w			BPL1PTH,0
+			dc.w			BPL2PTL,0
+			dc.w			BPL2PTH,0
+			dc.w			BPL3PTL,0
+			dc.w			BPL3PTH,0
+			dc.w			BPL4PTL,0
+			dc.w			BPL4PTH,0
+			dc.w			BPL5PTL,0
+			dc.w			BPL5PTH,0
+			dc.w			BPL6PTL,0
+			dc.w			BPL6PTH,0
+
 cl_sprite:
 			dc.w			SPR0PTL,0
 			dc.w			SPR0PTH,0
@@ -1794,24 +1813,6 @@ cl_sprite:
 			dc.w			SPR6PTH,0
 			dc.w			SPR7PTL,0
 			dc.w			SPR7PTH,0
-
-cl_logo_bitplanes_nr:
-			dc.w			BPLCON0,0
-			dc.w			BPLCON1,0
-
-cl_logo_address:
-			dc.w			BPL1PTL,0
-			dc.w			BPL1PTH,0
-			dc.w			BPL2PTL,0
-			dc.w			BPL2PTH,0
-			dc.w			BPL3PTL,0
-			dc.w			BPL3PTH,0
-			dc.w			BPL4PTL,0
-			dc.w			BPL4PTH,0
-			dc.w			BPL5PTL,0
-			dc.w			BPL5PTH,0
-			dc.w			BPL6PTL,0
-			dc.w			BPL6PTH,0
 
 cl_logo_colors:
 			dc.w			COLOR00,0
@@ -1847,8 +1848,30 @@ cl_logo_colors:
 			dc.w			COLOR30,0
 			dc.w			COLOR31,0
 
+			; dc.l			$fffffffe									; koniec
+
 		; --- vector ---
 			dc.w			RASTER_VECTORS_CL-2,$ff00							; czekam na raster
+
+cl_vector_bitplanes_nr:
+			dc.w			BPLCON0,0
+
+cl_scroll:
+			dc.w			BPLCON1,$00f0
+
+cl_vector_address:
+			dc.w			BPL1PTL,0
+			dc.w			BPL1PTH,0
+			dc.w			BPL2PTL,0
+			dc.w			BPL2PTH,0
+			dc.w			BPL3PTL,0
+			dc.w			BPL3PTH,0
+			dc.w			BPL4PTL,0
+			dc.w			BPL4PTH,0
+			dc.w			BPL5PTL,0
+			dc.w			BPL5PTH,0
+			dc.w			BPL6PTL,0
+			dc.w			BPL6PTH,0
 
 cl_vector_colors:
 			dc.w			COLOR00,0
@@ -1891,26 +1914,7 @@ cl_sprites_colors:
 
 			dc.w			RASTER_VECTORS_CL,$ff00								; czekam na raster
 
-cl_vector_bitplanes_nr:
-			dc.w			BPLCON0,0
-cl_scroll:
-			dc.w			BPLCON1,$00f0
-
-cl_vector_address:
-			dc.w			BPL1PTL,0
-			dc.w			BPL1PTH,0
-			dc.w			BPL2PTL,0
-			dc.w			BPL2PTH,0
-			dc.w			BPL3PTL,0
-			dc.w			BPL3PTH,0
-			dc.w			BPL4PTL,0
-			dc.w			BPL4PTH,0
-			dc.w			BPL5PTL,0
-			dc.w			BPL5PTH,0
-			dc.w			BPL6PTL,0
-			dc.w			BPL6PTH,0
-
-			; dc.w			$ffdf,$fffe									; allow VPOS>$ff
+			dc.w			$ffdf,$fffe									; allow VPOS>$ff
 			dc.l			$fffffffe									; koniec
 
 ; =============================================================================
