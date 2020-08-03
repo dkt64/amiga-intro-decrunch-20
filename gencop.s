@@ -36,6 +36,9 @@ RES			EQU	8												;8=lores, 4=hires
 LINE_WIDTH		EQU	WIDTH/8
 
 RASTER_VECTORS_CL	EQU	$7001
+VECTOR_BTPL_OFFSET	EQU	0
+VECTOR_Y_OFFSET		EQU	80
+VECTOR_MAX_ZOOM		EQU	300
 
 PLOTS_NR		equ	14
 
@@ -98,7 +101,7 @@ init:
 
 			move.w			#$0000,BPLCON0(a6)								; ilość bitplanów
 			move.w			#$0000,BPLCON1(a6)								; poziomy skrol = 0
-			move.w			#PF2PRI+$3f,BPLCON2(a6)								; playfield 2 z przodu
+			move.w			#PF2PRI+$38,BPLCON2(a6)								; playfield 2 z przodu
 			move.w			#$0000,BPL1MOD(a6)								; modulo1
 			move.w			#$0000,BPL2MOD(a6)								; modulo2
 			move.w			#(XSTRT+(YSTRT*256)),DIWSTRT(a6)						; DIWSTRT - górny-lewy róg ekranu (2c81)
@@ -362,6 +365,8 @@ init:
 	; --- vector + scroll ---
 	; -----------------------------------------------------------------------------
 
+	; --- scroll bitplanes ---
+
 			move.w			#$6200+DBLPF,d0
 			move.l			#cl_vector_bitplanes_nr+2,a0
 			move.w			d0,(a0)
@@ -487,12 +492,6 @@ raster:
 			bne			raster
 
 	; ---------------------------------------------------------------------
-	; uruchomienie copperlisty
-	; ---------------------------------------------------------------------
-
-			move.l			#cl,COP1LCH(a6)
-
-	; ---------------------------------------------------------------------
 	; ustawienie adresów dla bitplanów vectora
 	; ---------------------------------------------------------------------
 
@@ -523,6 +522,11 @@ raster:
 			move.l			#cl_vector_address+2+4*09,a0
 			move.w			d0,(a0)
 
+	; ---------------------------------------------------------------------
+	; uruchomienie copperlisty
+	; ---------------------------------------------------------------------
+
+			move.l			#cl,COP1LCH(a6)
 
 	; ---------------------------------------------------------------------
 	; odtworzenie muzyki
@@ -580,7 +584,7 @@ my_fx:
 			move.l			buf_index,d0
 			move.l			#buf_tab,a0
 			move.l			(a0,d0),a2
-			move.l			#WIDTH/8*HEIGHT,d1
+			move.l			#WIDTH/8*HEIGHT-VECTOR_BTPL_OFFSET*WIDTH/8,d1
 			jsr			clear
 
 		; dycp
@@ -636,7 +640,7 @@ lp1:			move.l			pi,a1
 
 			addi.l			#160,d0
 			add.l			zoomx,d0
-			addi.l			#80,d1
+			addi.l			#VECTOR_Y_OFFSET,d1
 
 			move.l			pi,a1
 			move.l			#pxa,a2
@@ -653,7 +657,6 @@ lp1:			move.l			pi,a1
 			move.l			buf_index,d0
 			move.l			#buf_tab,a0
 			move.l			(a0,d0),a2
-			move.l			#WIDTH/8*HEIGHT,d1
 			jsr			draw_lines
 
 		; koniec my_fx
@@ -1068,7 +1071,7 @@ rotate:
 
 persp:
 	; d
-			move.l			#300,d3
+			move.l			#VECTOR_MAX_ZOOM,d3
 	; x*d
 			muls			d3,d0
 	; y*d
@@ -1283,6 +1286,53 @@ clear:
 			rts
 
 ; =============================================================================
+; Copy shifted char to btpl
+; d0 - char nr
+; d1 - poz y
+; a1 - 1st btpl address
+; =============================================================================
+
+; put_char_blitter:
+
+			MACRO			M_PUT_CHAR_BLITTER
+
+			lsl.l			#2,d0
+			move.l			#char_tab,a0
+			move.l			(a0,d0),a2
+			move.l			a1,d6
+			add.l			d1,a1
+
+			M_BLITTER_WAIT
+			move.w			#WIDTH/8-4,BLTAMOD(a6)
+			move.w			#WIDTH/8-4,BLTDMOD(a6)
+			clr.w			BLTCON1(a6)
+			move.w			#$09f0,BLTCON0(a6)
+			move.l			#$ffffffff,BLTAFWM(a6)
+
+			move.l			a2,BLTAPT(a6)
+			move.l			a1,BLTDPT(a6)
+			move.w			#$0702,BLTSIZE(a6)
+
+			add.l			#WIDTH/8*HEIGHT,a1
+			add.l			#WIDTH/8*HEIGHT,a2
+			M_BLITTER_WAIT
+			move.l			a2,BLTAPT(a6)
+			move.l			a1,BLTDPT(a6)
+			move.w			#$0702,BLTSIZE(a6)
+
+			add.l			#WIDTH/8*HEIGHT,a1
+			add.l			#WIDTH/8*HEIGHT,a2
+			M_BLITTER_WAIT
+			move.l			a2,BLTAPT(a6)
+			move.l			a1,BLTDPT(a6)
+			move.w			#$0702,BLTSIZE(a6)
+
+			move.l			d6,a1
+
+			ENDM
+			; rts
+
+; =============================================================================
 ; DYCP
 ; =============================================================================
 
@@ -1307,7 +1357,8 @@ dycp_lp1:		clr.l			d0
 			mulu.w			#WIDTH/8,d2
 			move.l			#0,d1
 			add.l			d2,d1
-			jsr			put_char
+			; jsr			put_char_blitter
+			M_PUT_CHAR_BLITTER
 			add.l			#4,a1
 			add.l			#1,d3
 			cmp.l			#10,d3
@@ -1381,7 +1432,8 @@ dycp_lp2:		clr.l			d0
 			mulu.w			#WIDTH/8,d2
 			move.l			#0,d1
 			add.l			d2,d1
-			jsr			put_char
+			; jsr			put_char_blitter
+			M_PUT_CHAR_BLITTER
 			add.l			#4,a1
 			add.l			#1,d3
 			cmp.l			#10,d3
@@ -1459,7 +1511,7 @@ txt_index:		dc.l			0
 		
 			include			"txt.s"
 			
-txt_temp:		dc.b			'          '
+txt_temp:		dc.b			'a         '
 txt_spaces:		dc.b			'          '
 
 			CNOP			0,4
@@ -1526,28 +1578,28 @@ buf_index_max		EQU	16
 buf_index:		dc.l			0
 
 buf_tab:
-			dc.l			buf+0*WIDTH/8*HEIGHT
-			dc.l			buf+1*WIDTH/8*HEIGHT
-			dc.l			buf+2*WIDTH/8*HEIGHT
-			dc.l			buf+3*WIDTH/8*HEIGHT
+			dc.l			buf+0*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+1*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+2*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+3*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
 
 buf_tab_bitplane0:
-			dc.l			buf+1*WIDTH/8*HEIGHT
-			dc.l			buf+2*WIDTH/8*HEIGHT
-			dc.l			buf+3*WIDTH/8*HEIGHT
-			dc.l			buf+0*WIDTH/8*HEIGHT
+			dc.l			buf+1*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+2*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+3*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+0*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
 
 buf_tab_bitplane1:
-			dc.l			buf+2*WIDTH/8*HEIGHT
-			dc.l			buf+3*WIDTH/8*HEIGHT
-			dc.l			buf+0*WIDTH/8*HEIGHT
-			dc.l			buf+1*WIDTH/8*HEIGHT
+			dc.l			buf+2*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+3*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+0*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+1*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
 
 buf_tab_bitplane2:
-			dc.l			buf+3*WIDTH/8*HEIGHT
-			dc.l			buf+0*WIDTH/8*HEIGHT
-			dc.l			buf+1*WIDTH/8*HEIGHT
-			dc.l			buf+2*WIDTH/8*HEIGHT
+			dc.l			buf+3*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+0*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+1*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf+2*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
 
 
 ; -----------------------------------------------------------------------------
@@ -1577,10 +1629,6 @@ oldadkcon:
 			CNOP			0,4
 gfxname: 	
 			dc.b			'graphics.library',0
-
-			CNOP			0,4
-fonty:	
-			incbin			"gfx/fonty_dark.raw"
 
 			include			"fonts.i"
 
@@ -1654,6 +1702,10 @@ char_tab:
 ; -----------------------------------------------------------------------------
 
 			CNOP			0,4
+fonty:	
+			incbin			"gfx/fonty_dark.raw"
+
+			CNOP			0,4
 empty_sprite:		dc.l			$40004100
 			dc.l			$00000000
 			dc.l			0
@@ -1679,7 +1731,7 @@ sprite4_data:		dc.l			$70d83002
 logo_bitplanes:
 			incbin			"gfx/SAMAR_logo_32col.raw"
 
-empty_buf1:
+; empty_buf1:
 			blk.b			WIDTH/8*HEIGHT,0
 
 			CNOP			0,4
@@ -1702,7 +1754,7 @@ buf7:
 			blk.b			WIDTH/8*HEIGHT,0
 
 	; bufor żeby nie nachodziło na dalsze regiony
-empty_buf2:
+; empty_buf2:
 			blk.b			WIDTH/8*HEIGHT,0
 
 			CNOP			0,4
