@@ -375,9 +375,18 @@ zmiana2:
 			cmpi.l			#370,time
 			bcs			zmiana3
 
-			jsr			show_scroll
 			jsr			my_fx
 zmiana3:
+
+	; ---------------------------------------------------------------------
+
+		; show dycp
+
+			cmpi.l			#370,time
+			bne			zmiana32
+
+			jsr			show_scroll
+zmiana32:
 
 	; ---------------------------------------------------------------------
 
@@ -578,7 +587,7 @@ my_fx:
 			move.l			buf_index,d0
 			move.l			#buf_tab,a0
 			move.l			(a0,d0),a2
-			move.l			#WIDTH/8*HEIGHT-VECTOR_BTPL_OFFSET*WIDTH/8,d1
+			move.l			#WIDTH/8*HEIGHT-$40*WIDTH/8,d1
 			jsr			clear
 
 		; obliczenia 

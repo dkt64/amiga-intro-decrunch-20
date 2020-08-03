@@ -21,7 +21,7 @@
         "--chip_memory=512",
         "--hard_drive_0=${workspaceFolder}/fs-uae/hd0",
         "--joystick_port_1=none",
-        "--amiga_model=A500",
+        "--amiga_model=A1200",
         "--slow_memory=512",
         "--floppy_drive_volume_empty=0"
       ]
@@ -46,7 +46,7 @@
         "emulator": "${workspaceFolder}/bin/fs-uae"
       },
       "emulatorWorkingDir": "${workspaceFolder}/bin",
-      "program": "${workspaceFolder}/fs-uae/hd0/gencop",
+      "program": "${workspaceFolder}/fs-uae/hd0/red-samar",
       "options": [
         "--chip_memory=512",
         "--hard_drive_0=${workspaceFolder}/fs-uae/hd0",
