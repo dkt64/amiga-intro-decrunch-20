@@ -38,7 +38,7 @@ LINE_WIDTH		EQU	WIDTH/8
 RASTER_VECTORS_CL	EQU	$7001
 VECTOR_BTPL_OFFSET	EQU	0
 VECTOR_Y_OFFSET		EQU	90
-VECTOR_MAX_ZOOM		EQU	330
+VECTOR_MAX_ZOOM		EQU	350
 
 PLOTS_NR		equ	14
 
@@ -244,21 +244,21 @@ init:
 			move.w			d0,(a0)
 
 	; bitplan 3
-			move.l			#buf+4*WIDTH/8*HEIGHT,d0
+			move.l			#buf5,d0
 			move.l			#cl_vector_address+2+4*00,a0
 			move.w			d0,(a0)
 			swap			d0
 			move.l			#cl_vector_address+2+4*01,a0
 			move.w			d0,(a0)
 	; bitplan 4
-			move.l			#buf+5*WIDTH/8*HEIGHT,d0
+			move.l			#buf6,d0
 			move.l			#cl_vector_address+2+4*04,a0
 			move.w			d0,(a0)
 			swap			d0
 			move.l			#cl_vector_address+2+4*05,a0
 			move.w			d0,(a0)
 	; bitplan 5
-			move.l			#buf+6*WIDTH/8*HEIGHT,d0
+			move.l			#buf7,d0
 			move.l			#cl_vector_address+2+4*08,a0
 			move.w			d0,(a0)
 			swap			d0
@@ -1802,28 +1802,28 @@ buf_index_max		EQU	16
 buf_index:		dc.l			0
 
 buf_tab:
-			dc.l			buf+0*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+1*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+2*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+3*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf0
+			dc.l			buf1
+			dc.l			buf2
+			dc.l			buf3
 
 buf_tab_bitplane0:
-			dc.l			buf+1*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+2*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+3*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+0*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf1
+			dc.l			buf2
+			dc.l			buf3
+			dc.l			buf0
 
 buf_tab_bitplane1:
-			dc.l			buf+2*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+3*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+0*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+1*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf2
+			dc.l			buf3
+			dc.l			buf0
+			dc.l			buf1
 
 buf_tab_bitplane2:
-			dc.l			buf+3*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+0*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+1*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
-			dc.l			buf+2*WIDTH/8*HEIGHT+VECTOR_BTPL_OFFSET*WIDTH/8
+			dc.l			buf3
+			dc.l			buf0
+			dc.l			buf1
+			dc.l			buf2
 
 
 ; -----------------------------------------------------------------------------
@@ -1957,17 +1957,22 @@ logo_bitplanes:
 
 	; bufor żeby nie nachodziło na dalsze regiony
 ; empty_buf1:
-			blk.b			WIDTH/8*HEIGHT,0
 
 			CNOP			0,4
+			blk.b			WIDTH/8*$40,0
 buf:
+buf0:
 			blk.b			WIDTH/8*HEIGHT,0
+			blk.b			WIDTH/8*$40,0
+buf1:
+			blk.b			WIDTH/8*HEIGHT,0
+			blk.b			WIDTH/8*$40,0
 buf2:
 			blk.b			WIDTH/8*HEIGHT,0
+			blk.b			WIDTH/8*$40,0
 buf3:
 			blk.b			WIDTH/8*HEIGHT,0
-buf4:
-			blk.b			WIDTH/8*HEIGHT,0
+			blk.b			WIDTH/8*$40,0
 
 fonty_bitplanes:
 		; incbin			"gfx/fonty_dark.raw"
