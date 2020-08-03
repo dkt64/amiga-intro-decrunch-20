@@ -374,24 +374,24 @@ init:
 
 	; bitplan 3
 			move.l			#buf+4*WIDTH/8*HEIGHT,d0
-			move.l			#cl_vector_address+2+4*02,a0
+			move.l			#cl_vector_address+2+4*00,a0
 			move.w			d0,(a0)
 			swap			d0
-			move.l			#cl_vector_address+2+4*03,a0
+			move.l			#cl_vector_address+2+4*01,a0
 			move.w			d0,(a0)
 	; bitplan 4
 			move.l			#buf+5*WIDTH/8*HEIGHT,d0
-			move.l			#cl_vector_address+2+4*06,a0
+			move.l			#cl_vector_address+2+4*04,a0
 			move.w			d0,(a0)
 			swap			d0
-			move.l			#cl_vector_address+2+4*07,a0
+			move.l			#cl_vector_address+2+4*05,a0
 			move.w			d0,(a0)
 	; bitplan 5
 			move.l			#buf+6*WIDTH/8*HEIGHT,d0
-			move.l			#cl_vector_address+2+4*10,a0
+			move.l			#cl_vector_address+2+4*08,a0
 			move.w			d0,(a0)
 			swap			d0
-			move.l			#cl_vector_address+2+4*11,a0
+			move.l			#cl_vector_address+2+4*09,a0
 			move.w			d0,(a0)
 
 	; kolory vector
@@ -507,26 +507,26 @@ raster:
 	; bitplan 0
 			move.l			#buf_tab_bitplane0,a0
 			move.l			(a0,d1),d0
-			move.l			#cl_vector_address+2+4*00,a0
+			move.l			#cl_vector_address+2+4*02,a0
 			move.w			d0,(a0)
 			swap			d0
-			move.l			#cl_vector_address+2+4*01,a0
+			move.l			#cl_vector_address+2+4*03,a0
 			move.w			d0,(a0)
 	; bitplan 1
 			move.l			#buf_tab_bitplane1,a0
 			move.l			(a0,d1),d0
-			move.l			#cl_vector_address+2+4*04,a0
+			move.l			#cl_vector_address+2+4*06,a0
 			move.w			d0,(a0)
 			swap			d0
-			move.l			#cl_vector_address+2+4*05,a0
+			move.l			#cl_vector_address+2+4*07,a0
 			move.w			d0,(a0)
 	; bitplan 2
 			move.l			#buf_tab_bitplane2,a0
 			move.l			(a0,d1),d0
-			move.l			#cl_vector_address+2+4*08,a0
+			move.l			#cl_vector_address+2+4*10,a0
 			move.w			d0,(a0)
 			swap			d0
-			move.l			#cl_vector_address+2+4*09,a0
+			move.l			#cl_vector_address+2+4*11,a0
 			move.w			d0,(a0)
 
 	; ---------------------------------------------------------------------
@@ -1447,7 +1447,7 @@ dycp_lp2:		clr.l			d0
 	; ---------------------------------------------------------------------
 
 			move.l			dycp_scroll,d0
-			lsl.l			#4,d0
+			; lsl.l			#4,d0
 			move.l			#cl_scroll+2,a0
 			move.w			d0,(a0)
 
@@ -1705,7 +1705,7 @@ char_tab:
 
 			CNOP			0,4
 fonty:	
-			incbin			"gfx/fonty_dark.raw"
+			incbin			"gfx/fonty.raw"
 
 			CNOP			0,4
 empty_sprite:		dc.l			$40004100
@@ -1766,8 +1766,8 @@ logo_colors:
 
 			CNOP			0,4
 vector_colors:
+			incbin			"gfx/fonty.pal"
 			dc.w			BACKGROUND_COLOR,$0511,$0633,$0755,$0877,$0999,$0bbb,$0ddd
-			incbin			"gfx/fonty_dark.pal"
 	
 ; -----------------------------------------------------------------------------
 ; copperlista
@@ -1859,7 +1859,7 @@ cl_vector_bitplanes_nr:
 			dc.w			BPLCON0,0
 
 cl_scroll:
-			dc.w			BPLCON1,$00f0
+			dc.w			BPLCON1,$000f
 
 cl_vector_address:
 			dc.w			BPL1PTL,0
