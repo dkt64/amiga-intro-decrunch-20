@@ -8,7 +8,5 @@
 =  Graphics by   Isildur              =
 =  Code by       Don Kichote          =
 =                                     =
-=             AMIGA OCS               =
-=                                     =
 =   Samar Productions in 2020-08-01   =
 =======================================

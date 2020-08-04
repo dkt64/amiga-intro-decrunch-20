@@ -289,11 +289,17 @@ mainloop:
 	; ---------------------------------------------------------------------
 	; czekanie na nową ramkę
 	; ---------------------------------------------------------------------
-raster:
+
+raster1:
 			move.l			VPOSR(a6),d0
 			and.l			#$1ff00,d0
 			cmp.l			#300<<8,d0
-			bne			raster
+			bne			raster1
+raster2:
+			move.l			VPOSR(a6),d0
+			and.l			#$1ff00,d0
+			cmp.l			#301<<8,d0
+			bne			raster2
 
 	; ---------------------------------------------------------------------
 	; uruchomienie copperlisty
